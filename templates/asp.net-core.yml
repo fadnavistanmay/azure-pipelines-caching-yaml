@@ -1,0 +1,36 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  PACKAGES_PATH: $(Pipeline.Workspace)/.nuget/packages
+
+steps:
+
+- task: CacheBeta@1
+  inputs:
+    key: nuget | $(Agent.OS)
+    path: $(PACKAGES_PATH)
+    cacheHitVar: CACHE_RESTORED
+  displayName: 'Cache Nuget'
+  
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    packagesDirectory: $(PACKAGES_PATH)
+  displayName: 'dotnet restore'
+  condition: ne(variables.CACHE_RESTORED, 'true')
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    arguments: --packages $(PACKAGES_PATH)
+  displayName: 'dotnet build $(buildConfiguration)'
