@@ -11,6 +11,8 @@ pool:
 
 variables:
   YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
+  CACHE_KEY: yarn | $(Agent.OS) | yarn.lock
+  CACHE_FALLBACK_KEY: yarn | $(Agent.OS)
 
 steps:
 - task: NodeTool@0
@@ -20,7 +22,8 @@ steps:
 
 - task: CacheBeta@1
   inputs:
-    key: yarn | $(Agent.OS) | yarn.lock
+    key: $(CACHE_KEY)
+    restoreKeys: $(CACHE_FALLBACK_KEY)
     path: $(YARN_CACHE_FOLDER)
     cacheHitVar: CACHE_RESTORED 
   displayName: 'Cache yarn packages'

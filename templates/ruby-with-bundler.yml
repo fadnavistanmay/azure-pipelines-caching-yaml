@@ -8,6 +8,8 @@ pool:
 
 variables:
   BUNDLE_PATH : $(Pipeline.Workspace)/.bundle
+  CACHE_KEY: gems | $(Agent.OS) | pipelines-ruby.gemspec
+  CACHE_FALLBACK_KEY: gems | $(Agent.OS)
 
 steps:
 - task: UseRubyVersion@0
@@ -16,7 +18,8 @@ steps:
 
 - task: CacheBeta@1
   inputs:
-    key: gems | $(Agent.OS) | pipelines-ruby.gemspec
+    key: $(CACHE_KEY)
+    restoreKeys: $(CACHE_FALLBACK_KEY)
     path: $(BUNDLE_PATH)
     cacheHitVar: CACHE_RESTORED
   displayName: Cache gems

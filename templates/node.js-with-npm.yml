@@ -11,6 +11,8 @@ pool:
 
 variables:
   npm_config_cache: $(Pipeline.Workspace)/.npm
+  CACHE_KEY: npm | $(Agent.OS) | package-lock.json
+  CACHE_FALLBACK_KEY: npm | $(Agent.OS)
 
 steps:
 - task: NodeTool@0
@@ -20,7 +22,8 @@ steps:
 
 - task: CacheBeta@1
   inputs:
-    key: npm | $(Agent.OS) | package-lock.json
+    key: $(CACHE_KEY)
+    restoreKeys: $(CACHE_FALLBACK_KEY)
     path: $(npm_config_change)
     cacheHitVar: CACHE_RESTORED 
   displayName: 'Cache npm'

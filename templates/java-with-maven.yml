@@ -12,12 +12,15 @@ pool:
 variables:
   MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
   MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+  CACHE_KEY: maven | $(Agent.OS) | **/pom.xml
+  CACHE_FALLBACK_KEY: maven | $(Agent.OS)
 
 steps:
 
 - task: CacheBeta@1
   inputs:
-    key: maven | **/pom.xml
+    key: $(CACHE_KEY)
+    restoreKeys: $(CACHE_FALLBACK_KEY)
     path: $(MAVEN_CACHE_FOLDER)
     cacheHitVar: CACHE_RESTORED
   displayName: Cache Mevn local repo

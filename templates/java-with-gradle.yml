@@ -11,6 +11,8 @@ pool:
 
 variables:
   GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
+  CACHE_KEY: gradle | $(Agent.JobName) | $(Build.BuildId)
+  CACHE_FALLBACK_KEY: gradle | $(Agent.JobName)
 
 parameters:
   continueOnError: false
@@ -19,9 +21,8 @@ parameters:
 steps:
   - task: CacheBeta@0
     inputs:
-      key: |
-        gradle
-        $(Agent.JobName)
+      key: $(CACHE_KEY)
+      restoreKeys: $(CACHE_FALLBACK_KEY)
       path: $(GRADLE_USER_HOME)
     displayName: Gradle build cache
 

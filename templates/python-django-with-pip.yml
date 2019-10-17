@@ -7,6 +7,8 @@ pool:
 
 variables:
   PYTHONPATH: $(Pipeline.Workspace)/.cache/pip
+  CACHE_KEY: pip | $(Agent.OS) | $(Build.BuildId) | Pipfile.lock
+  CACHE_FALLBACK_KEY: pip | $(Agent.OS) | $(Build.BuildId)
 
 steps:
 - task: UsePythonVersion@0
@@ -31,7 +33,8 @@ steps:
       
 - task: CacheBeta@1
   inputs:
-    key: pip | $(Agent.OS) | Pipfile.lock
+    key: $(CACHE_KEY)
+    restoreKeys: $(CACHE_FALLBACK_KEYS)
     path: $(PYTHONPATH)
     cacheHitVar: CACHE_RESTORED
   displayName: Cache packages

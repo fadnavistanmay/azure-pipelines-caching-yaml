@@ -1,127 +1,32 @@
-trigger:
-  batch: true
-  branches:
-    include:
-    - master
+  - job: ubuntu_hosted
+    pool:
+      vmImage: 'ubuntu-latest'
 
-jobs:
-- job: 'XenialBuild'
-  displayName: "End-to-end Linux (Xenial) build"
-  timeoutInMinutes: 0
-  cancelTimeoutInMinutes: 300
+    variables:
+      system.debug: true
+      CACHE_KEY: $(Agent.OS) | $(Build.SourcesDirectory)/.git/modules/vcpkg/HEAD | "gcc" | $(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-linux.txt
+      CACHE_FALLBACK_KEY: $(Agent.OS) | $(Build.SourcesDirectory)/.git/modules/vcpkg/HEAD | "gcc" |
+      # Since vcpkg is a Git submodule, its commit id is stored at /.git/modules/vcpkg/HEAD.
+      # vcpkgGitRef: not needed !
 
-  pool:
-    vmImage: 'Ubuntu-16.04'
-
-  variables:
-    CCACHE_DIR: $(Pipeline.Workspace)/ccache
-
-  steps:
-    - checkout: self
-      persistCredentials: 'true'
-
-    # Dependency manager
-    - bash: |
-        sudo apt-get update && sudo apt-get install -qq gcc-4.8 g++-4.8 make libgl-dev cmake python3-pip python-numpy dos2unix libxkbcommon-x11-0 doxygen
-        curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-        sudo apt-get install git-lfs
-        git lfs install
-      displayName: 'Install dependencies from Aptitude'
-
-    - bash: |
-        sudo apt-get install ccache -y    
-        echo "##vso[task.prependpath]/usr/lib/ccache"
-      displayName: Install ccache
-
-    # Pull LFS
-    - bash: |
-        export GIT_LFS_SKIP_SMUDGE=1
-        git lfs pull --include "binaries/precompiledApps/linux.zip"
-        git lfs pull --include "binaries/qt_5.12.1/linux.zip"
-        #echo "Not doing this until quota is improved on GitHub"
-      displayName: 'Pull LFS'
-
-    # Testing LFS
-    - bash: |
-        ls -lt binaries/qt_5.12.1/
-        ls -lt binaries/precompiledApps/
-      displayName: 'Testing LFS pull'
-
-    # Moving LFS Files
-    - bash: |
-        mkdir bin
-        cd bin
-        mv ../binaries/precompiledApps/linux.zip ./binaries_linux.zip
-        mv ../binaries/qt_5.12.1/linux.zip ./qt.zip
-        ls -lt
-      displayName: 'Moving LFS files to the appropriate location under bin'
-
-    - task: CacheBeta@0
-      inputs:
-        key: "default"
-        path: $(CCACHE_DIR)
-      displayName: ccache
-
-    # Configure and build superbuild
-    - bash: |
-        cd bin
-        cmake -DCMAKE_INSTALL_PREFIX="./install/appdir/usr" -DQT_DOWNLOAD_FORCE=ON ..
-        make -j2
-      displayName: 'Configure and compile Superbuild'
-
-    - bash: |
-        du -sh $(CCACHE_DIR)
-        ccache -s
-      displayName: Show ccache size
-
-    # Configure and build CaPTk
-    - bash: |
-        cd bin
-        cmake -DCMAKE_INSTALL_PREFIX="./install/appdir/usr" -DQT_DOWNLOAD_FORCE=ON ..
-        make -j2
-        #make install/strip
-      displayName: 'Configure and compile CaPTk'
-
-    - bash: |
-        du -sh $(CCACHE_DIR)
-        ccache -s
-      displayName: Show ccache size
-
-    # Check qt
-    - bash: |
-        cd bin
-        ls -a
-        ls ./qt/
-      displayName: 'Check qt'      
-      
-    # Check libra
-    - bash: |
-        cd bin/install/appdir/usr/bin/
-        ls -l
-      displayName: 'Checking ${installDir}/bin'
-      
-    # Build a package
-    - bash: |
-        export PATH=`pwd`/bin/qt/5.12.1/bin:$PATH
-        export PATH=`pwd`/bin/qt/5.12.1/libexec:$PATH
-        export CMAKE_PREFIX_PATH=`pwd`/bin/qt/5.12.1/lib/cmake/Qt5:$CMAKE_PREFIX_PATH
-        rm -rf regression
-        rm -rf binaries
-
-        #make install
-
-        # export PKG_FAST_MODE=1
-        ./scripts/captk-pkg
-        ./scripts/captk-pkg
-
-        rm -rf bin
-        rm -rf src
-        rm -rf docs*
-
-        rm -rf scripts
-
-        mv CaPTk_*_Installer.bin $(Build.ArtifactStagingDirectory)
-        
-      displayName: 'Set up environment variables for packager and build a package'
-      condition: not(true)
-    
+    steps:
+      - checkout: self
+        submodules: recursive
+      - task: CacheBeta@0
+        displayName: Cache vcpkg
+        inputs:
+          key: $(CACHE_KEY)
+          restoreKeys: $(CACHE_FALLBACK_KEY)
+          path: '$(Build.SourcesDirectory)/vcpkg'
+      - task: lucappa.cmake-ninja-vcpkg-tasks.d855c326-b1c0-4d6f-b1c7-440ade6835fb.run-vcpkg@0
+        displayName: 'Run vcpkg'
+        inputs:
+          vcpkgArguments: '@$(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-linux.txt'
+          vcpkgDirectory: '$(Build.SourcesDirectory)/vcpkg'
+      - task: lucappa.cmake-ninja-vcpkg-tasks.f2b1ec7d-bc54-4cc8-b9ed-1bc7f37c9dc6.run-cmake@0
+        displayName: 'Run CMake with Ninja'
+        inputs:
+          cmakeListsTxtPath: 'cmakelists.txt/CMakeLists.txt'
+          useVcpkgToolchainFile: true
+          buildWithCMakeArgs: '-- -v'
+          ninjaDownloadUrl: https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip

@@ -12,12 +12,15 @@ pool:
 variables:
   buildConfiguration: 'Release'
   PACKAGES_PATH: $(Pipeline.Workspace)/.nuget/packages
+  CACHE_KEY: nuget | $(Agent.OS) | $(Build.BuildId)
+  CACHE_FALLBACK_KEY: nuget | $(Agent.OS)
 
 steps:
 
 - task: CacheBeta@1
   inputs:
-    key: nuget | $(Agent.OS)
+    key: $(CACHE_KEY)
+    restoreKeys: $(CACHE_FALLBACK_KEY)
     path: $(PACKAGES_PATH)
     cacheHitVar: CACHE_RESTORED
   displayName: 'Cache Nuget'
