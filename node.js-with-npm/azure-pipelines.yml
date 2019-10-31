@@ -8,24 +8,29 @@ trigger:
 
 strategy:
   matrix:
-    linux:
-      imageName: 'ubuntu-16.04'
-    mac:
-      imageName: 'macos-10.13'
-    windows:
-      imageName: 'vs2017-win2016'
-
+    linux 16:    
+      VM_IMAGE: ubuntu-16.04
+    linux 18:
+      VM_IMAGE: ubuntu-18.04
+    windows 2017:
+      VM_IMAGE: vs2017-win2016
+    windows 2019:
+      VM_IMAGE: windows-2019
+    macos 10.13:
+      VM_IMAGE: macos-10.13
+    macos 10.14:
+      VM_IMAGE: macos-10.14
 pool:
-  vmImage: $(imageName)
+  vmImage: $(VM_IMAGE)
 
 variables:
   skipComponentGovernanceDetection: true
   # # cache the npm cache
   # npm_config_cache: $(Pipeline.Workspace)/.npm
   # dotnpm_CACHE_KEY: '$(dotnpm_CACHE_FALLBACK_KEY) | node.js-with-npm/package-lock.json'
-  # dotnpm_CACHE_FALLBACK_KEY: '".npm" | "$(imageName)"'
+  # dotnpm_CACHE_FALLBACK_KEY: '".npm" | "$(VM_IMAGE)"'
   # cache the node_modules folder
-  node_modules_CACHE_KEY: '"node_modules" | "$(imageName)" | node.js-with-npm/package-lock.json'
+  node_modules_CACHE_KEY: '"node_modules" | "$(VM_IMAGE)" | node.js-with-npm/package-lock.json'
 
 steps:
 - task: NodeTool@0
