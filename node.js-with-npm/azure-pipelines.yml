@@ -41,9 +41,12 @@ steps:
   condition: ne(variables.NODE_MODULES_RESTORED, 'true')
 
 - script: |
+    cd node.js-with-npm
     npm ci
   displayName: 'npm ci'
   condition: ne(variables.NODE_MODULES_RESTORED, 'true')
 
-- script: npm run-script build
+- script: |
+    cd node.js-with-npm
+    npm run-script build
   displayName: 'npm build'
