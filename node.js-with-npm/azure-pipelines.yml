@@ -6,14 +6,24 @@
 trigger:
 - master
 
+strategy:
+  matrix:
+    linux:
+      imageName: 'ubuntu-16.04'
+    mac:
+      imageName: 'macos-10.13'
+    windows:
+      imageName: 'vs2017-win2016'
+
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: $(imageName)
 
 variables:
-  # cache the npm cache
-  npm_config_cache: $(Pipeline.Workspace)/.npm
-  dotnpm_CACHE_KEY: '$(dotnpm_CACHE_FALLBACK_KEY) | node.js-with-npm/package-lock.json'
-  dotnpm_CACHE_FALLBACK_KEY: '".npm" | "$(Agent.OS)"'
+  skipComponentGovernanceDetection: true
+  # # cache the npm cache
+  # npm_config_cache: $(Pipeline.Workspace)/.npm
+  # dotnpm_CACHE_KEY: '$(dotnpm_CACHE_FALLBACK_KEY) | node.js-with-npm/package-lock.json'
+  # dotnpm_CACHE_FALLBACK_KEY: '".npm" | "$(Agent.OS)"'
   # cache the node_modules folder
   node_modules_CACHE_KEY: '"node_modules" | "$(Agent.OS)" | node.js-with-npm/package-lock.json'
 
@@ -31,14 +41,14 @@ steps:
     cacheHitVar: NODE_MODULES_RESTORED
   displayName: 'Cache node_modules'
   
-# if we didn't get a good match for node_modules, see if we have a recent copy of the .npm cache folder
-- task: CacheBeta@1
-  inputs:
-    key: $(dotnpm_CACHE_KEY)
-    restoreKeys: $(dotnpm_CACHE_FALLBACK_KEY)
-    path: $(npm_config_change)
-  displayName: 'Cache .npm'
-  condition: ne(variables.NODE_MODULES_RESTORED, 'true')
+# # if we didn't get a good match for node_modules, see if we have a recent copy of the .npm cache folder
+# - task: CacheBeta@1
+#   inputs:
+#     key: $(dotnpm_CACHE_KEY)
+#     restoreKeys: $(dotnpm_CACHE_FALLBACK_KEY)
+#     path: $(npm_config_change)
+#   displayName: 'Cache .npm'
+#   condition: ne(variables.NODE_MODULES_RESTORED, 'true')
 
 - script: |
     cd node.js-with-npm
