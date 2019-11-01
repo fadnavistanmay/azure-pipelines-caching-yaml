@@ -38,13 +38,6 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
-- script: |
-    node --version
-    npm --version
-    npm update npm -g
-    node --version
-    npm --version
-
 # only look for the exact match for node_modules
 - task: CacheBeta@1
   inputs:
