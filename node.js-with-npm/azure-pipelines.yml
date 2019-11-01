@@ -17,15 +17,15 @@ strategy:
     windows 2017 Uncached:
       VM_IMAGE: vs2017-win2016
       ENABLE_CACHE: 0
-    windows 2019 Uncached:
-      VM_IMAGE: windows-2019
-      ENABLE_CACHE: 0
-    macos 10.13 Uncached:
-      VM_IMAGE: macos-10.13
-      ENABLE_CACHE: 0
-    macos 10.14 Uncached:
-      VM_IMAGE: macos-10.14
-      ENABLE_CACHE: 0
+    # windows 2019 Uncached:
+    #   VM_IMAGE: windows-2019
+    #   ENABLE_CACHE: 0
+    # macos 10.13 Uncached:
+    #   VM_IMAGE: macos-10.13
+    #   ENABLE_CACHE: 0
+    # macos 10.14 Uncached:
+    #   VM_IMAGE: macos-10.14
+    #   ENABLE_CACHE: 0
     # linux 16 Files:    
     #   VM_IMAGE: ubuntu-16.04
     #   AZP_CACHING_CONTENT_FORMAT: Files
@@ -35,9 +35,9 @@ strategy:
     windows 2017 Files:
       VM_IMAGE: vs2017-win2016
       AZP_CACHING_CONTENT_FORMAT: Files
-    windows 2019 Files:
-      VM_IMAGE: windows-2019
-      AZP_CACHING_CONTENT_FORMAT: Files
+    # windows 2019 Files:
+    #   VM_IMAGE: windows-2019
+    #   AZP_CACHING_CONTENT_FORMAT: Files
     # macos 10.13 Files:
     #   VM_IMAGE: macos-10.13
     #   AZP_CACHING_CONTENT_FORMAT: Files
@@ -53,15 +53,15 @@ strategy:
     windows 2017:
       VM_IMAGE: vs2017-win2016
       AZP_CACHING_CONTENT_FORMAT: SingleTar
-    windows 2019:
-      VM_IMAGE: windows-2019
-      AZP_CACHING_CONTENT_FORMAT: SingleTar
-    macos 10.13:
-      VM_IMAGE: macos-10.13
-      AZP_CACHING_CONTENT_FORMAT: SingleTar
-    macos 10.14:
-      VM_IMAGE: macos-10.14
-      AZP_CACHING_CONTENT_FORMAT: SingleTar
+    # windows 2019:
+    #   VM_IMAGE: windows-2019
+    #   AZP_CACHING_CONTENT_FORMAT: SingleTar
+    # macos 10.13:
+    #   VM_IMAGE: macos-10.13
+    #   AZP_CACHING_CONTENT_FORMAT: SingleTar
+    # macos 10.14:
+    #   VM_IMAGE: macos-10.14
+    #   AZP_CACHING_CONTENT_FORMAT: SingleTar
 pool:
   vmImage: $(VM_IMAGE)
 
