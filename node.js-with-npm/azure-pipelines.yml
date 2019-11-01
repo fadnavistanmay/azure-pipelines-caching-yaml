@@ -32,9 +32,9 @@ strategy:
     # linux 18 Files:
     #   VM_IMAGE: ubuntu-18.04
     #   AZP_CACHING_CONTENT_FORMAT: Files
-    windows 2017 Files:
-      VM_IMAGE: vs2017-win2016
-      AZP_CACHING_CONTENT_FORMAT: Files
+    # windows 2017 Files:
+    #   VM_IMAGE: vs2017-win2016
+    #   AZP_CACHING_CONTENT_FORMAT: Files
     # windows 2019 Files:
     #   VM_IMAGE: windows-2019
     #   AZP_CACHING_CONTENT_FORMAT: Files
@@ -47,12 +47,15 @@ strategy:
     linux 16:    
       VM_IMAGE: ubuntu-16.04
       AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
     linux 18:
       VM_IMAGE: ubuntu-18.04
       AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
     windows 2017:
       VM_IMAGE: vs2017-win2016
       AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
     # windows 2019:
     #   VM_IMAGE: windows-2019
     #   AZP_CACHING_CONTENT_FORMAT: SingleTar
