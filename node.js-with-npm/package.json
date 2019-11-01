@@ -11,7 +11,6 @@
   "scripts": {
     "test": "mocha",
     "preinstall": "node preinstall.js",
-    "postinstall": "node build/npm/postinstall.js",
     "compile": "gulp compile --max_old_space_size=4095",
     "watch": "gulp watch --max_old_space_size=4095",
     "watch-client": "gulp watch-client --max_old_space_size=4095",
