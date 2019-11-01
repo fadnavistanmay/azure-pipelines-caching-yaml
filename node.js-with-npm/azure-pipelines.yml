@@ -10,16 +10,40 @@ strategy:
   matrix:
     linux 16:    
       VM_IMAGE: ubuntu-16.04
+      AZP_CACHING_CONTENT_FORMAT: Files
     linux 18:
       VM_IMAGE: ubuntu-18.04
+      AZP_CACHING_CONTENT_FORMAT: Files
     windows 2017:
       VM_IMAGE: vs2017-win2016
+      AZP_CACHING_CONTENT_FORMAT: Files
     windows 2019:
       VM_IMAGE: windows-2019
+      AZP_CACHING_CONTENT_FORMAT: Files
     macos 10.13:
       VM_IMAGE: macos-10.13
+      AZP_CACHING_CONTENT_FORMAT: Files
     macos 10.14:
       VM_IMAGE: macos-10.14
+      AZP_CACHING_CONTENT_FORMAT: Files
+    linux 16:    
+      VM_IMAGE: ubuntu-16.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+    linux 18:
+      VM_IMAGE: ubuntu-18.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+    windows 2017:
+      VM_IMAGE: vs2017-win2016
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+    windows 2019:
+      VM_IMAGE: windows-2019
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+    macos 10.13:
+      VM_IMAGE: macos-10.13
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+    macos 10.14:
+      VM_IMAGE: macos-10.14
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
 pool:
   vmImage: $(VM_IMAGE)
 
@@ -30,7 +54,7 @@ variables:
   # dotnpm_CACHE_KEY: '$(dotnpm_CACHE_FALLBACK_KEY) | node.js-with-npm/package-lock.json'
   # dotnpm_CACHE_FALLBACK_KEY: '".npm" | "$(VM_IMAGE)"'
   # cache the node_modules folder
-  node_modules_CACHE_KEY: '"node_modules" | "$(VM_IMAGE)" | node.js-with-npm/package-lock.json'
+  node_modules_CACHE_KEY: '"node_modules" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | node.js-with-npm/package-lock.json'
 
 steps:
 - task: NodeTool@0
