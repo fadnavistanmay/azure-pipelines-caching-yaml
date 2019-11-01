@@ -26,24 +26,24 @@ strategy:
     macos 10.14 Uncached:
       VM_IMAGE: macos-10.14
       ENABLE_CACHE: 0
-    linux 16 Files:    
-      VM_IMAGE: ubuntu-16.04
-      AZP_CACHING_CONTENT_FORMAT: Files
-    linux 18 Files:
-      VM_IMAGE: ubuntu-18.04
-      AZP_CACHING_CONTENT_FORMAT: Files
+    # linux 16 Files:    
+    #   VM_IMAGE: ubuntu-16.04
+    #   AZP_CACHING_CONTENT_FORMAT: Files
+    # linux 18 Files:
+    #   VM_IMAGE: ubuntu-18.04
+    #   AZP_CACHING_CONTENT_FORMAT: Files
     windows 2017 Files:
       VM_IMAGE: vs2017-win2016
       AZP_CACHING_CONTENT_FORMAT: Files
     windows 2019 Files:
       VM_IMAGE: windows-2019
       AZP_CACHING_CONTENT_FORMAT: Files
-    macos 10.13 Files:
-      VM_IMAGE: macos-10.13
-      AZP_CACHING_CONTENT_FORMAT: Files
-    macos 10.14 Files:
-      VM_IMAGE: macos-10.14
-      AZP_CACHING_CONTENT_FORMAT: Files
+    # macos 10.13 Files:
+    #   VM_IMAGE: macos-10.13
+    #   AZP_CACHING_CONTENT_FORMAT: Files
+    # macos 10.14 Files:
+    #   VM_IMAGE: macos-10.14
+    #   AZP_CACHING_CONTENT_FORMAT: Files
     linux 16:    
       VM_IMAGE: ubuntu-16.04
       AZP_CACHING_CONTENT_FORMAT: SingleTar
