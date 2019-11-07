@@ -75,7 +75,7 @@ variables:
   # dotnpm_CACHE_KEY: '$(dotnpm_CACHE_FALLBACK_KEY) | node.js-with-npm/package-lock.json'
   # dotnpm_CACHE_FALLBACK_KEY: '".npm" | "$(VM_IMAGE)"'
   # cache the node_modules folder
-  node_modules_CACHE_KEY: '"node_modules" | "$(VM_IMAGE)" | "npm" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | node.js-with-npm/package-lock.json'
+  node_modules_CACHE_KEY: '"node_modules" | "$(VM_IMAGE)" | "yarn" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | node.js-with-yarn/package-lock.json'
 
 steps:
 - task: NodeTool@0
@@ -87,7 +87,7 @@ steps:
 - task: CacheBeta@1
   inputs:
     key: $(node_modules_CACHE_KEY)
-    path: 'node.js-with-npm/node_modules'
+    path: 'node.js-with-yarn/node_modules'
     cacheHitVar: NODE_MODULES_RESTORED
   displayName: 'Cache node_modules'
   condition: ne(variables.ENABLE_CACHE, '0')
@@ -101,8 +101,19 @@ steps:
 #   displayName: 'Cache .npm'
 #   condition: ne(variables.NODE_MODULES_RESTORED, 'true')
 
+#- script: |
+#    cd node.js-with-npm
+#    npm ci
+#  displayName: 'npm ci'
+#  condition: ne(variables.NODE_MODULES_RESTORED, 'true')
+
 - script: |
-    cd node.js-with-npm
-    npm ci
-  displayName: 'npm ci'
+    cd node.js-with-yarn
+    yarn --frozen-lockfile
+  displayName: 'Install dependencies'
   condition: ne(variables.NODE_MODULES_RESTORED, 'true')
+
+- script: |
+    cd node.js-with-yarn
+    yarn build
+  displayName: 'yarn build'
