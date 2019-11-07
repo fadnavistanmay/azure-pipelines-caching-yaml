@@ -1,6 +1,0 @@
-# From https://github.com/Microsoft/vsts-agent/blob/master/docs/preview/yamlgettingstarted-definition.md
-
-queue: Hosted VS2017
-
-steps:
-- script: echo hello world
