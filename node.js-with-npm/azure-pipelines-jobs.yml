@@ -73,7 +73,7 @@ jobs:
       path: 'node.js-with-npm/node_modules'
       cacheHitVar: NODE_MODULES_RESTORED
     displayName: 'Cache node_modules'
-    condition: ne(variables.ENABLE_CACHE, '0')
+    #condition: ne(variables.ENABLE_CACHE, '0')
 
   # # if we didn't get a good match for node_modules, see if we have a recent copy of the .npm cache folder
   # - task: CacheBeta@1
