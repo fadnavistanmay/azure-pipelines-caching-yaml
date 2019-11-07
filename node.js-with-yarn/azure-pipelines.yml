@@ -115,5 +115,5 @@ steps:
 
 - script: |
     cd node.js-with-yarn
-    yarn run test
-  displayName: 'yarn build'
+    yarn run
+  displayName: 'yarn run'
