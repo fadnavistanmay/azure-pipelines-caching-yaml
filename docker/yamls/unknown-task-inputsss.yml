@@ -1,0 +1,11 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+steps:
+- task: DeleteFiles@1
+  displayName: "Trying to delete only tempFilessss, but the sss key on my keyboard iss sssticky."
+  inputs:
+    SSSSourceFolder: "tempFiles"
+    Contents: "*"

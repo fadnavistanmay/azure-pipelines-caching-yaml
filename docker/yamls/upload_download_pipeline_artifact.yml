@@ -1,0 +1,36 @@
+trigger:
+- master
+jobs:
+- job: publishhh
+  pool:
+    vmImage: 'macOS-10.13'
+  steps:
+  - script: |  
+     cd $(Build.ArtifactStagingDirectory)
+     echo "hello world" > hi.txt
+     echo "bye" > bye.txt
+     mkdir usa
+     cd usa
+     mkdir nc
+     cd nc
+     mkdir durham
+     cd durham
+     echo "hello from Durham" > greeting.txt
+
+    displayName: Create some text files
+  - task: PublishPipelineArtifact@0
+    displayName: "Publish Pipeline Artifact: deedoop"
+    inputs:
+      artifactName: deedoop
+      targetPath: '$(Build.ArtifactStagingDirectory)'
+- job: downloaddd
+  dependsOn: publishhh
+  condition: succeeded()
+  pool:
+    vmImage: 'macOS-10.13'
+  steps:
+  - task: DownloadPipelineArtifact@0
+    displayName: "Download Pipeline Artifacts"
+    inputs:
+      artifactName: deedoop
+      targetPath: plartDownload

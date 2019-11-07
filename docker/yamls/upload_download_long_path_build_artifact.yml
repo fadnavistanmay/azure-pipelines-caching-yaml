@@ -1,0 +1,55 @@
+trigger:
+- master
+
+variables:
+  uploadVmImage: 'Ubuntu-16.04'
+  downloadVmImage: 'Ubuntu-16.04'
+  
+jobs:
+- job: publishhh
+  pool:
+    vmImage: $(uploadVmImage)
+  steps:
+  - script: |  
+     cd $(Build.ArtifactStagingDirectory)
+     echo "hello world" > hi.txt
+     echo "bye" > bye.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 56.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 107.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 157.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 207.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 257.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 307.txt
+     mkdir fortyNineCharactersFollowedByASlashMakesFiftyChar
+     cd fortyNineCharactersFollowedByASlashMakesFiftyChar
+     echo "GotHere" > 357.txt
+
+    displayName: Create some text files
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Artifact: drop"
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: drop
+      publishLocation: Container
+- job: downloaddd
+  dependsOn: publishhh
+  condition: succeeded()
+  pool:
+    vmImage: $(downloadVmImage)
+  steps:
+  - task: DownloadBuildArtifacts@0
+    displayName: "Download Build Artifacts"
+    inputs:
+      artifactName: drop

@@ -1,0 +1,89 @@
+trigger:
+- master
+
+variables:
+  uploadVmImage: 'Ubuntu-16.04'
+  downloadVmImage: 'Ubuntu-16.04'
+  
+jobs:
+- job: publish1
+  pool:
+    vmImage: $(uploadVmImage)
+  steps:
+  - script: |  
+     mkdir art1
+     cd art1
+     mkdir firstPublish
+     cd firstPublish
+     echo "hello world" > hi.txt
+     echo "bye" > bye.txt
+     echo "goodbye" > goodbye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     cat bye.txt >> goodbye.txt
+     cat goodbye.txt >> bye.txt
+     
+    displayName: Create first folder for artifact
+  - task: PublishPipelineArtifact@0
+    displayName: "Publish Artifact: drop"
+    inputs:
+      targetPath: art1
+      artifactName: drop
+
+- job: publish2
+  pool:
+    vmImage: $(uploadVmImage)
+  steps:
+  - script: |  
+     mkdir art2
+     cd art2
+     mkdir secondPublish
+     cd secondPublish
+     echo "hello world" > hi2.txt
+     echo "bye" > bye2.txt
+     
+    displayName: Create second folder for artifact
+  - task: PublishPipelineArtifact@0
+    displayName: "Publish Artifact: drop"
+    inputs:
+      targetPath: art2
+      artifactName: drop
+
+- job: download
+  dependsOn: [ publish1, publish2 ]
+  condition: succeeded()
+  pool:
+    vmImage: $(downloadVmImage)
+  steps:
+  - task: DownloadBuildArtifacts@0
+    displayName: "Download Build Artifacts"
+    inputs:
+      artifactName: drop
