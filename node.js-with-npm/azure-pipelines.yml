@@ -1,0 +1,108 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+- master
+
+strategy:
+  matrix:
+    linux 16 Uncached:    
+      VM_IMAGE: ubuntu-16.04
+      ENABLE_CACHE: 0
+    linux 18 Uncached:
+      VM_IMAGE: ubuntu-18.04
+      ENABLE_CACHE: 0
+    windows 2017 Uncached:
+      VM_IMAGE: vs2017-win2016
+      ENABLE_CACHE: 0
+    # windows 2019 Uncached:
+    #   VM_IMAGE: windows-2019
+    #   ENABLE_CACHE: 0
+    # macos 10.13 Uncached:
+    #   VM_IMAGE: macos-10.13
+    #   ENABLE_CACHE: 0
+    # macos 10.14 Uncached:
+    #   VM_IMAGE: macos-10.14
+    #   ENABLE_CACHE: 0
+    # linux 16 Files:    
+    #   VM_IMAGE: ubuntu-16.04
+    #   AZP_CACHING_CONTENT_FORMAT: Files
+    # linux 18 Files:
+    #   VM_IMAGE: ubuntu-18.04
+    #   AZP_CACHING_CONTENT_FORMAT: Files
+    # windows 2017 Files:
+    #   VM_IMAGE: vs2017-win2016
+    #   AZP_CACHING_CONTENT_FORMAT: Files
+    # windows 2019 Files:
+    #   VM_IMAGE: windows-2019
+    #   AZP_CACHING_CONTENT_FORMAT: Files
+    # macos 10.13 Files:
+    #   VM_IMAGE: macos-10.13
+    #   AZP_CACHING_CONTENT_FORMAT: Files
+    # macos 10.14 Files:
+    #   VM_IMAGE: macos-10.14
+    #   AZP_CACHING_CONTENT_FORMAT: Files
+    linux 16:    
+      VM_IMAGE: ubuntu-16.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+    linux 18:
+      VM_IMAGE: ubuntu-18.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+    windows 2017:
+      VM_IMAGE: vs2017-win2016
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+    # windows 2019:
+    #   VM_IMAGE: windows-2019
+    #   AZP_CACHING_CONTENT_FORMAT: SingleTar
+    # macos 10.13:
+    #   VM_IMAGE: macos-10.13
+    #   AZP_CACHING_CONTENT_FORMAT: SingleTar
+    # macos 10.14:
+    #   VM_IMAGE: macos-10.14
+    #   AZP_CACHING_CONTENT_FORMAT: SingleTar
+pool:
+  vmImage: $(VM_IMAGE)
+
+variables:
+  skipComponentGovernanceDetection: true
+  # # cache the npm cache
+  # npm_config_cache: $(Pipeline.Workspace)/.npm
+  # dotnpm_CACHE_KEY: '$(dotnpm_CACHE_FALLBACK_KEY) | node.js-with-npm/package-lock.json'
+  # dotnpm_CACHE_FALLBACK_KEY: '".npm" | "$(VM_IMAGE)"'
+  # cache the node_modules folder
+  node_modules_CACHE_KEY: '"node_modules" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | node.js-with-npm/package-lock.json'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Install Node.js'
+
+# only look for the exact match for node_modules
+- task: CacheBeta@1
+  inputs:
+    key: $(node_modules_CACHE_KEY)
+    path: 'node.js-with-npm/node_modules'
+    cacheHitVar: NODE_MODULES_RESTORED
+  displayName: 'Cache node_modules'
+  condition: ne(variables.ENABLE_CACHE, '0')
+  
+# # if we didn't get a good match for node_modules, see if we have a recent copy of the .npm cache folder
+# - task: CacheBeta@1
+#   inputs:
+#     key: $(dotnpm_CACHE_KEY)
+#     restoreKeys: $(dotnpm_CACHE_FALLBACK_KEY)
+#     path: $(npm_config_change)
+#   displayName: 'Cache .npm'
+#   condition: ne(variables.NODE_MODULES_RESTORED, 'true')
+
+- script: |
+    cd node.js-with-npm
+    npm ci
+  displayName: 'npm ci'
+  condition: ne(variables.NODE_MODULES_RESTORED, 'true')
