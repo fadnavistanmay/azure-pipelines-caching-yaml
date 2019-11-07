@@ -24,4 +24,4 @@ variables:
    # dotnpm_CACHE_KEY: '$(dotnpm_CACHE_FALLBACK_KEY) | node.js-with-npm/package-lock.json'
    # dotnpm_CACHE_FALLBACK_KEY: '".npm" | "$(VM_IMAGE)"'
    # cache the node_modules folder
-   node_modules_CACHE_KEY: '"node_modules" | "$(VM_IMAGE)" | | "$(Build.BuildId)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | node.js-with-npm/package-lock.json'
+   node_modules_CACHE_KEY: '"node_modules" | "$(VM_IMAGE)" | "$(Build.BuildId)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | node.js-with-npm/package-lock.json'
