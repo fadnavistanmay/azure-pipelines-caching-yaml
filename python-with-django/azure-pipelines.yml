@@ -36,6 +36,7 @@ pool:
 
 variables:
   #PREFIX_PATH: $(Pipeline.Workspace)/.cache/pip
+  skipComponentGovernanceDetection: true
   PYTHONPATH: $(Pipeline.Workspace)/python-with-django/.cache/pip
   CACHE_KEY: '"python" | "django2" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | python-with-django/Pipfile.lock'
   system.debug: true
