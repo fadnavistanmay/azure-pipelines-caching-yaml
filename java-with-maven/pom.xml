@@ -45,11 +45,6 @@
       <artifactId>hibernate-entitymanager</artifactId>
       <version>3.3.2.GA</version>
     </dependency>
-    <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>jta</artifactId>
-      <version>1.0.1B</version>
-    </dependency>
       <dependency>
           <groupId>org.hibernate</groupId>
           <artifactId>ejb3-persistence</artifactId>
