@@ -55,14 +55,19 @@ steps:
   condition: ne(variables.ENABLE_CACHE, '0')
 
 - script: |
+    cd ruby-with-bundler
     #gem install bundler
     bundle install --retry=3 --jobs=4
   displayName: 'bundle install'
   condition: ne(variables.CACHE_RESTORED, 'true')
 
-- script: gem list
+- script: |
+    cd ruby-with-bundler
+    gem list
 
-- script: bundle exec rake
+- script: |
+    cd ruby-with-bundler
+    bundle exec rake
   displayName: 'bundle exec rake'
 
 # - script: bundle exec rspec spec --format RspecJunitFormatter --out test_results/TEST-rspec.xml
