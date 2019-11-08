@@ -55,21 +55,32 @@ steps:
     packageType: sdk
     version: 3.0.100
     installationPath: $(Agent.ToolsDirectory)/dotnet
-  
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'restore'
-    projects: $(Pipeline.Workspace)/dotnet-with-nuget/*.csproj
-    #packagesDirectory: $(PACKAGES_PATH)
+
+- script: |
+    cd dotnet-with-nuget
+    dotnet restore
   displayName: 'dotnet restore'
   condition: ne(variables.CACHE_RESTORED, 'true')
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: $(Pipeline.Workspace)/dotnet-with-nuget/*.csproj
-    #arguments: --packages $(PACKAGES_PATH)
+- script: |
+    cd dotnet-with-nuget
+    dotnet build $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
+
+#- task: DotNetCoreCLI@2
+#  inputs:
+#    command: 'restore'
+#    projects: $(Pipeline.Workspace)/dotnet-with-nuget/*.csproj
+#    #packagesDirectory: $(PACKAGES_PATH)
+#  displayName: 'dotnet restore'
+#  condition: ne(variables.CACHE_RESTORED, 'true')
+#
+#- task: DotNetCoreCLI@2
+#  inputs:
+#    command: 'build'
+#    projects: $(Pipeline.Workspace)/dotnet-with-nuget/*.csproj
+#    #arguments: --packages $(PACKAGES_PATH)
+#  displayName: 'dotnet build $(buildConfiguration)'
 
 - script: ls -l $(NUGET_PACKAGES)
 #steps:
