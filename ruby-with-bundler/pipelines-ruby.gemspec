@@ -45,7 +45,6 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'sqlite3', '~> 1.3.7'
   spec.add_development_dependency 'mocha', '~> 1.5.0'
-  spec.add_development_dependency 'simplecov', '~> 0.7.0'
   spec.add_development_dependency 'test-unit', '~> 3.2.8'
   spec.add_development_dependency 'minitest', '~> 4.7.5'
   spec.add_development_dependency 'redcarpet'
