@@ -38,4 +38,17 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec_junit_formatter"
   spec.add_development_dependency "simplecov"
   spec.add_development_dependency "simplecov-cobertura"
+
+  spec.add_dependency 'actionpack', '>= 3.0.0'
+  spec.add_dependency 'railties', '>= 3.0.0'
+  spec.add_dependency 'i18n', '>= 0.5.0'
+
+  spec.add_development_dependency 'sqlite3', '~> 1.3.7'
+  spec.add_development_dependency 'mocha', '~> 1.5.0'
+  spec.add_development_dependency 'simplecov', '~> 0.7.0'
+  spec.add_development_dependency 'test-unit', '~> 3.2.8'
+  spec.add_development_dependency 'minitest', '~> 4.7.5'
+  spec.add_development_dependency 'redcarpet'
+  spec.add_development_dependency 'yard', '~> 0.9.11'
+  spec.add_development_dependency 'pry'
 end
