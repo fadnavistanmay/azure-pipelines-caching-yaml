@@ -35,7 +35,7 @@ pool:
 variables:
   skipComponentGovernanceDetection: true
   buildConfiguration: 'Release'
-  NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
+  NUGET_PACKAGES: $(Pipeline.Workspace)/dotnet-with-nuget/.nuget/packages
   CACHE_KEY: '"nuget" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | $(CACHE_PACK)'
   system.debug: true
 
@@ -59,6 +59,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
+    projects: $(Pipeline.Workspace)/dotnet-with-nuget
     #packagesDirectory: $(PACKAGES_PATH)
   displayName: 'dotnet restore'
   condition: ne(variables.CACHE_RESTORED, 'true')
@@ -66,6 +67,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
+    projects: $(Pipeline.Workspace)/dotnet-with-nuget
     #arguments: --packages $(PACKAGES_PATH)
   displayName: 'dotnet build $(buildConfiguration)'
 
