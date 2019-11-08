@@ -1,0 +1,38 @@
+steps:
+
+- task: CacheBeta@1
+  inputs:
+    key: $(CACHE_KEY)
+    path: $(NUGET_PACKAGES)
+    cacheHitVar: CACHE_RESTORED
+  displayName: 'Cache Nuget'
+
+- task: Cache@2
+  inputs:
+    key: $(CACHE_KEY) | cachega
+    path: $(NUGET_PACKAGES)
+  displayName: 'Cache Nuget GA'
+
+- task: UseDotNet@2
+  displayName: 'Use .NET Core sdk'
+  inputs:
+    packageType: sdk
+    version: 3.0.100
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+
+- script: dotnet --list-sdks
+  
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    #packagesDirectory: $(PACKAGES_PATH)
+  displayName: 'dotnet restore'
+  condition: ne(variables.CACHE_RESTORED, 'true')
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    #arguments: --packages $(PACKAGES_PATH)
+  displayName: 'dotnet build $(buildConfiguration)'
+
+- script: ls -l $(NUGET_PACKAGES)

@@ -1,0 +1,95 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+
+strategy:
+  matrix:
+    linux 16 Uncached:    
+      VM_IMAGE: ubuntu-16.04
+      ENABLE_CACHE: 0
+    linux 18 Uncached:
+      VM_IMAGE: ubuntu-18.04
+      ENABLE_CACHE: 0
+    windows 2017 Uncached:
+      VM_IMAGE: vs2017-win2016
+      ENABLE_CACHE: 0
+    linux 16:    
+      VM_IMAGE: ubuntu-16.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+    linux 18:
+      VM_IMAGE: ubuntu-18.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+    windows 2017:
+      VM_IMAGE: vs2017-win2016
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+pool:
+  vmImage: $(VM_IMAGE)
+
+variables:
+  skipComponentGovernanceDetection: true
+  buildConfiguration: 'Release'
+  NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
+  CACHE_KEY: '"nuget" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | $(CACHE_PACK)'
+  system.debug: true
+
+steps:
+
+- task: CacheBeta@1
+  inputs:
+    key: $(CACHE_KEY)
+    path: $(NUGET_PACKAGES)
+    cacheHitVar: CACHE_RESTORED
+  displayName: 'Cache Nuget'
+  condition: ne(variables.ENABLE_CACHE, '0')
+
+- task: UseDotNet@2
+  displayName: 'Use .NET Core sdk'
+  inputs:
+    packageType: sdk
+    version: 3.0.100
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+  
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    #packagesDirectory: $(PACKAGES_PATH)
+  displayName: 'dotnet restore'
+  condition: ne(variables.CACHE_RESTORED, 'true')
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    #arguments: --packages $(PACKAGES_PATH)
+  displayName: 'dotnet build $(buildConfiguration)'
+
+- script: ls -l $(NUGET_PACKAGES)
+#steps:
+#
+#- task: CacheBeta@1
+#  inputs:
+#    key: $(CACHE_KEY)
+#    path: $(PACKAGES_PATH)
+#    cacheHitVar: CACHE_RESTORED
+#  displayName: 'Cache Nuget'
+#  
+#- task: DotNetCoreCLI@2
+#  inputs:
+#    command: 'restore'
+#    packagesDirectory: $(PACKAGES_PATH)
+#  displayName: 'dotnet restore'
+#  condition: ne(variables.CACHE_RESTORED, 'true')
+#
+#- task: DotNetCoreCLI@2
+#  inputs:
+#    command: 'build'
+#    arguments: --packages $(PACKAGES_PATH)
+#  displayName: 'dotnet build $(buildConfiguration)'
+#
+#- script: ls -l $(PACKAGES_PATH)
