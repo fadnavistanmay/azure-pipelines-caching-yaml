@@ -14,10 +14,6 @@ keyring >= 4.1.1            # Minimum version 4.1.1
 coverage != 3.5             # Version Exclusion. Anything except version 3.5
 Mopidy-Dirble ~= 1.1        # Compatible release. Same as >= 1.1, == 1.*
 flask==0.10.1
-itsdangerous==0.24        # via flask
-jinja2==2.7.3             # via flask
-markupsafe==0.23          # via jinja2
-werkzeug==0.10.4          # via flask
 appnope==0.1.0
 backcall==0.1.0
 beautifulsoup4==4.6.3
