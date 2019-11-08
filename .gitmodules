@@ -1,3 +1,6 @@
 [submodule "scripts2"]
 	path = scripts2
 	url = https://github.com/fadnavistanmay/Scripts
+[submodule "scripts3"]
+	path = scripts3
+	url = https://github.com/fadnavistanmay/Scripts
