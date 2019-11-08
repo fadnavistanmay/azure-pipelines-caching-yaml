@@ -64,7 +64,7 @@ steps:
 
 - script: |
     cd dotnet-with-nuget
-    dotnet build $(buildConfiguration)
+    dotnet build
   displayName: 'dotnet build $(buildConfiguration)'
 
 #- task: DotNetCoreCLI@2
