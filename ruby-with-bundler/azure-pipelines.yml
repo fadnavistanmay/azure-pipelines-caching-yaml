@@ -1,0 +1,80 @@
+# Ruby
+# Package your Ruby application.
+# Add steps that install rails, analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/ruby
+
+#pool:
+#  vmImage: 'Ubuntu 16.04'
+
+tigger:
+- master
+
+strategy:
+  matrix:
+    linux 16 Uncached:    
+      VM_IMAGE: ubuntu-16.04
+      ENABLE_CACHE: 0
+    linux 18 Uncached:
+      VM_IMAGE: ubuntu-18.04
+      ENABLE_CACHE: 0
+    windows 2017 Uncached:
+      VM_IMAGE: vs2017-win2016
+      ENABLE_CACHE: 0
+    linux 16:    
+      VM_IMAGE: ubuntu-16.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+    linux 18:
+      VM_IMAGE: ubuntu-18.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+    windows 2017:
+      VM_IMAGE: vs2017-win2016
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+pool:
+  vmImage: $(VM_IMAGE)
+
+variables:
+  skipComponentGovernanceDetection: true
+  BUNDLE_PATH : $(Pipeline.Workspace)/ruby-with-bundler/.bundle
+  CACHE_KEY: '"gems" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | ruby-with-bundler/pipelines-ruby.gemspec'
+  system.debug: true
+
+steps:
+- task: UseRubyVersion@0
+  inputs:
+    versionSpec: '>= 2.5'
+
+- task: CacheBeta@1
+  inputs:
+    key: $(CACHE_KEY)
+    path: $(BUNDLE_PATH)
+    cacheHitVar: CACHE_RESTORED
+  displayName: Cache gems
+  condition: ne(variables.ENABLE_CACHE, '0')
+
+- script: |
+    #gem install bundler
+    bundle install --retry=3 --jobs=4
+  displayName: 'bundle install'
+  condition: ne(variables.CACHE_RESTORED, 'true')
+
+- script: gem list
+
+- script: bundle exec rake
+  displayName: 'bundle exec rake'
+
+# - script: bundle exec rspec spec --format RspecJunitFormatter --out test_results/TEST-rspec.xml
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '**/test-*.xml'
+    testRunTitle: 'Ruby tests'
+    
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
