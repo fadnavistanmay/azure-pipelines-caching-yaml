@@ -15,6 +15,11 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jackson-provider</artifactId>
+      <version>1.1.GA</version>
+    </dependency>
   </dependencies>
 
   <build>
