@@ -57,7 +57,7 @@ steps:
 - script: |
     cd ruby-with-bundler
     gem install bundler
-    gem install sqlite3 -v 1.3.13
+    gem install sqlite3 -v '1.3.13' --source
     bundle install --retry=3 --jobs=4
   displayName: 'bundle install'
   condition: ne(variables.CACHE_RESTORED, 'true')
