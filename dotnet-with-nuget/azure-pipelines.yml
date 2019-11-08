@@ -59,7 +59,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    workingDirectory: $(Pipeline.Workspace)/dotnet-with-nuget
+    projects: $(Pipeline.Workspace)/dotnet-with-nuget/*.csproj
     #packagesDirectory: $(PACKAGES_PATH)
   displayName: 'dotnet restore'
   condition: ne(variables.CACHE_RESTORED, 'true')
@@ -67,7 +67,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    workingDirectory: $(Pipeline.Workspace)/dotnet-with-nuget
+    projects: $(Pipeline.Workspace)/dotnet-with-nuget/*.csproj
     #arguments: --packages $(PACKAGES_PATH)
   displayName: 'dotnet build $(buildConfiguration)'
 
