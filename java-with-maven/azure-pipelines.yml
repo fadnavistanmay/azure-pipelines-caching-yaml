@@ -48,6 +48,7 @@ steps:
     #restoreKeys: $(CACHE_RESTOREKEY)
     cacheHitVar: CACHE_RESTORED
   displayName: Cache Maven local repo
+  condition: ne(variables.ENABLE_CACHE, '0') 
 
 - script: |
     cd java-with-maven
