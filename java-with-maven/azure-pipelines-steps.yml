@@ -1,0 +1,24 @@
+steps:
+- task: CacheBeta@1
+  inputs:
+    key: $(CACHE_KEY)
+    path: $(MAVEN_CACHE_FOLDER)
+    #restoreKeys: $(CACHE_RESTOREKEY)
+    cacheHitVar: CACHE_RESTORED
+  displayName: Cache Maven local repo
+
+- task: Cache@2
+  inputs:
+    key: $(CACHE_KEY) | cachega
+    path: $(MAVEN_CACHE_FOLDER)
+    #restoreKeys: $(CACHE_RESTOREKEY)
+  displayName: Cache Maven local repo GA
+
+- script: mvn install -B -e
+  displayName: Install
+  condition: ne(variables.CACHE_RESTORED, 'true')
+
+- script: mvn package
+  displayName: Build
+
+#- script: echo "<!--Your comment-->" >> pom.xml

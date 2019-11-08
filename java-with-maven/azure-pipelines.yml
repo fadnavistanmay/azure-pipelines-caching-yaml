@@ -1,0 +1,89 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+- master
+
+strategy:
+  matrix:
+    linux 16 Uncached:    
+      VM_IMAGE: ubuntu-16.04
+      ENABLE_CACHE: 0
+    linux 18 Uncached:
+      VM_IMAGE: ubuntu-18.04
+      ENABLE_CACHE: 0
+    windows 2017 Uncached:
+      VM_IMAGE: vs2017-win2016
+      ENABLE_CACHE: 0
+    linux 16:    
+      VM_IMAGE: ubuntu-16.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+    linux 18:
+      VM_IMAGE: ubuntu-18.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+    windows 2017:
+      VM_IMAGE: vs2017-win2016
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+pool:
+  vmImage: $(VM_IMAGE)
+
+
+variables:
+  skipComponentGovernanceDetection: true
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/java-with-maven/.m2/repository
+  MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+  CACHE_KEY: '"maven" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | java-with-maven/**/pom.xml'
+  system.debug: true
+
+steps:
+- task: CacheBeta@1
+  inputs:
+    key: $(CACHE_KEY)
+    path: $(MAVEN_CACHE_FOLDER)
+    #restoreKeys: $(CACHE_RESTOREKEY)
+    cacheHitVar: CACHE_RESTORED
+  displayName: Cache Maven local repo
+
+- script: |
+    cd java-with-maven
+    mvn install -B -e
+  displayName: Install
+  condition: ne(variables.CACHE_RESTORED, 'true')
+
+- script: |
+    cd java-with-maven
+    mvn package
+  displayName: Build
+
+#steps:
+#
+#- task: CacheBeta@1
+#  inputs:
+#    key: maven2 | **/pom.xml
+#    path: $(MAVEN_CACHE_FOLDER)
+#    cacheHitVar: CACHE_RESTORED
+#  displayName: Cache Mevn local repo
+#
+#- script: mvn install -B -e
+#  displayName: Install
+#  condition: ne(variables.CACHE_RESTORED, 'true')
+#
+#- script: mvn package
+#  displayName: Build
+
+
+#- task: Maven@3
+#  inputs:
+#    mavenPomFile: 'pom.xml'
+#    mavenOptions: '-Xmx3072m'
+#    javaHomeOption: 'JDKVersion'
+#    jdkVersionOption: '1.8'
+#    jdkArchitectureOption: 'x64'
+#    publishJUnitResults: true
+#    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+#    goals: 'package'
