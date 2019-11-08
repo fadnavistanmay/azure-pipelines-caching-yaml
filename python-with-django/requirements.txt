@@ -1,7 +1,6 @@
 ###### Requirements without Version Specifiers ######
 nose
 nose-cov
-beautifulsoup4
 setuptools
 wheel
 django
