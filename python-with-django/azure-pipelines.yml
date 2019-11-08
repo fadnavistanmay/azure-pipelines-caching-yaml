@@ -1,0 +1,179 @@
+# Python Django
+# Test a Django project on multiple versions of Python.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+#pool:
+#  vmImage: 'Ubuntu 16.04'
+
+trigger:
+- master
+
+strategy:
+  matrix:
+    linux 16 Uncached:    
+      VM_IMAGE: ubuntu-16.04
+      ENABLE_CACHE: 0
+    linux 18 Uncached:
+      VM_IMAGE: ubuntu-18.04
+      ENABLE_CACHE: 0
+    windows 2017 Uncached:
+      VM_IMAGE: vs2017-win2016
+      ENABLE_CACHE: 0
+    linux 16:    
+      VM_IMAGE: ubuntu-16.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+    linux 18:
+      VM_IMAGE: ubuntu-18.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+    windows 2017:
+      VM_IMAGE: vs2017-win2016
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+pool:
+  vmImage: $(VM_IMAGE)
+
+variables:
+  #PREFIX_PATH: $(Pipeline.Workspace)/.cache/pip
+  PYTHONPATH: $(Pipeline.Workspace)/python-with-django/.cache/pip
+  CACHE_KEY: '"python" | "django" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | python-with-django/Pipfile.lock'
+  system.debug: true
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: 3.5
+    architecture: 'x64'
+
+- task: PythonScript@0
+  displayName: 'Export project path'
+  inputs:
+    scriptSource: 'inline'
+    script: |
+      """Search all subdirectories for `manage.py`."""
+      from glob import iglob
+      from os import path
+      # Python >= 3.5
+      manage_py = next(iglob(path.join('**', 'manage.py'), recursive=True), None)
+      if not manage_py:
+          raise SystemExit('Could not find a Django project')
+      project_location = path.dirname(path.abspath(manage_py))
+      print('Found Django project in', project_location)
+      print('##vso[task.setvariable variable=projectRoot]{}'.format(project_location))
+
+- task: CacheBeta@1
+  inputs:
+    key: $(CACHE_KEY)
+    path: $(PYTHONPATH)
+    cacheHitVar: CACHE_RESTORED
+  displayName: 'Cache packages'
+  condition: ne(variables.ENABLE_CACHE, '0')
+
+- script: |
+    cd python-with-django
+    pip install --target=$(PYTHONPATH) -r requirements.txt
+  displayName: 'Install prerequisites'
+  condition: ne(variables.CACHE_RESTORED, 'true')
+
+- script: |
+    cd python-with-django
+    pushd '$(projectRoot)'
+    python manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner --no-input
+  condition: succeededOrFailed()
+  displayName: 'Run tests'
+
+- script: ls -l $(PYTHONPATH)
+  condition: succeededOrFailed()
+
+- script: python -c 'help("xmlrunner")'
+  condition: succeededOrFailed()
+
+#stages:
+#- stage: firstruntar
+#  displayName: 'Empty cache Tar'
+#  variables:
+#    CACHE_PACK: tar
+#  jobs:
+#  - template: azure-pipelines-jobs.yml
+#
+#- stage: firstrunfiles
+#  displayName: 'Empty Cache Files'
+#  variables:
+#    AZP_CACHING_CONTENT_FORMAT: Files
+#    CACHE_PACK: files
+#  jobs:
+#  - template: azure-pipelines-jobs.yml
+#
+#- stage: secondruntar
+#  dependsOn: firstruntar
+#  displayName: 'Cached TAR'
+#  variables:
+#    CACHE_PACK: tar
+#  jobs:
+#  - template: azure-pipelines-jobs.yml
+#
+#- stage: secondrunfiles
+#  dependsOn: firstrunfiles
+#  displayName: 'Cached Files'
+#  variables:
+#    AZP_CACHING_CONTENT_FORMAT: Files
+#    CACHE_PACK: files
+#  jobs:
+#  - template: azure-pipelines-jobs.yml
+
+#steps:
+#- task: UsePythonVersion@0
+#  inputs:
+#    versionSpec: 3.5
+#    architecture: 'x64'
+#
+#- task: PythonScript@0
+#  displayName: 'Export project path'
+#  inputs:
+#    scriptSource: 'inline'
+#    script: |
+#      """Search all subdirectories for `manage.py`."""
+#      from glob import iglob
+#      from os import path
+#      # Python >= 3.5
+#      manage_py = next(iglob(path.join('**', 'manage.py'), recursive=True), None)
+#      if not manage_py:
+#          raise SystemExit('Could not find a Django project')
+#      project_location = path.dirname(path.abspath(manage_py))
+#      print('Found Django project in', project_location)
+#      print('##vso[task.setvariable variable=projectRoot]{}'.format(project_location))
+#
+#- task: CacheBeta@1
+#  inputs:
+#    key: pipww1a43 | $(Agent.OS) | Pipfile.lock
+#    path: $(PYTHONPATH)
+#    cacheHitVar: CACHE_RESTORED
+#  displayName: Cache packages
+#
+##- script: python -m pip install django
+#  
+#- script: |
+#    #python -m pip install --upgrade pip setuptools wheel django
+#    #pip install --user
+#    pip install --target=$(PYTHONPATH) -r requirements.txt
+#    #pip install unittest-xml-reporting
+#  displayName: 'Install prerequisites'
+#  condition: ne(variables.CACHE_RESTORED, 'true')
+#
+#- script: |
+#    pushd '$(projectRoot)'
+#    python manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner --no-input
+#  condition: succeededOrFailed()
+#  displayName: 'Run tests'
+#
+#- script: |
+#    ls -l $(PYTHONPATH)
+#
+#- script: python -c 'help("xmlrunner")'
+#
+#- task: PublishTestResults@2
+#  condition: succeededOrFailed()
+#  inputs:
+#    testResultsFiles: "**/TEST-*.xml"
+#    testRunTitle: 'Python $(PYTHON_VERSION)'

@@ -1,0 +1,57 @@
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: 3.5
+    architecture: 'x64'
+
+- task: PythonScript@0
+  displayName: 'Export project path'
+  inputs:
+    scriptSource: 'inline'
+    script: |
+      """Search all subdirectories for `manage.py`."""
+      from glob import iglob
+      from os import path
+      # Python >= 3.5
+      manage_py = next(iglob(path.join('**', 'manage.py'), recursive=True), None)
+      if not manage_py:
+          raise SystemExit('Could not find a Django project')
+      project_location = path.dirname(path.abspath(manage_py))
+      print('Found Django project in', project_location)
+      print('##vso[task.setvariable variable=projectRoot]{}'.format(project_location))
+
+- task: CacheBeta@1
+  inputs:
+    key: $(CACHE_KEY)
+    path: $(PYTHONPATH)
+    cacheHitVar: CACHE_RESTORED
+  displayName: Cache packages
+
+- task: Cache@2
+  inputs:
+    key: $(CACHE_KEY) | cachega
+    path: $(PYTHONPATH)
+  displayName: Cache packages GA
+
+- script: |
+    pip install --target=$(PYTHONPATH) -r requirements.txt
+  displayName: 'Install prerequisites'
+  condition: ne(variables.CACHE_RESTORED, 'true')
+
+- script: |
+    pushd '$(projectRoot)'
+    python manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner --no-input
+  condition: succeededOrFailed()
+  displayName: 'Run tests'
+
+- script: ls -l $(PYTHONPATH)
+  condition: succeededOrFailed()
+
+- script: python -c 'help("xmlrunner")'
+  condition: succeededOrFailed()
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: "**/TEST-*.xml"
+    testRunTitle: 'Python $(PYTHON_VERSION)'
