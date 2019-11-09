@@ -31,7 +31,7 @@ pool:
 variables:
   skipComponentGovernanceDetection: true
   GRADLE_USER_HOME: $(Pipeline.Workspace)/java-with-gradle/.gradle
-  CACHE_KEY: '"gradle" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | gradle.properties'
+  CACHE_KEY: '"gradle" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | java-with-gradle/gradle.properties'
   #CACHE_RESTOREKEY: gradle | $(Agent.OS) | $(Build.BuildId)
   system.debug: true
 
