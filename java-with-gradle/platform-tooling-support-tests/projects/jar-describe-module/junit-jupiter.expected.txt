@@ -1,0 +1,5 @@
+org.junit.jupiter@${jupiterVersion} jar:file:.+junit-jupiter/build/libs/junit-jupiter-${jupiterVersion}.jar/!module-info.class
+requires java.base mandated
+requires org.junit.jupiter.api transitive
+requires org.junit.jupiter.engine transitive
+requires org.junit.jupiter.params transitive

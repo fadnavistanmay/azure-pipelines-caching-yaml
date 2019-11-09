@@ -1,0 +1,143 @@
+[[launcher-api]]
+=== JUnit Platform Launcher API
+
+One of the prominent goals of JUnit 5 is to make the interface between JUnit and its
+programmatic clients – build tools and IDEs – more powerful and stable. The purpose is to
+decouple the internals of discovering and executing tests from all the filtering and
+configuration that's necessary from the outside.
+
+JUnit 5 introduces the concept of a `Launcher` that can be used to discover, filter, and
+execute tests. Moreover, third party test libraries – like Spock, Cucumber, and FitNesse
+– can plug into the JUnit Platform's launching infrastructure by providing a custom
+`{TestEngine}`.
+
+The launcher API is in the `{junit-platform-launcher}` module.
+
+An example consumer of the launcher API is the `{ConsoleLauncher}` in the
+`{junit-platform-console}` project.
+
+[[launcher-api-discovery]]
+==== Discovering Tests
+
+Introducing _test discovery_ as a dedicated feature of the platform itself will
+(hopefully) free IDEs and build tools from most of the difficulties they had to go
+through to identify test classes and test methods in the past.
+
+Usage Example:
+
+[source,java,indent=0]
+----
+include::{testDir}/example/UsingTheLauncherDemo.java[tags=imports]
+----
+
+[source,java,indent=0]
+----
+include::{testDir}/example/UsingTheLauncherDemo.java[tags=discovery]
+----
+
+There's currently the possibility to select classes, methods, and all classes in a
+package or even search for all tests in the classpath. Discovery takes place across all
+participating test engines.
+
+The resulting `TestPlan` is a hierarchical (and read-only) description of all engines,
+classes, and test methods that fit the `LauncherDiscoveryRequest`. The client can
+traverse the tree, retrieve details about a node, and get a link to the original source
+(like class, method, or file position). Every node in the test plan has a _unique ID_
+that can be used to invoke a particular test or group of tests.
+
+[[launcher-api-execution]]
+==== Executing Tests
+
+To execute tests, clients can use the same `LauncherDiscoveryRequest` as in the discovery
+phase or create a new request. Test progress and reporting can be achieved by registering
+one or more `{TestExecutionListener}` implementations with the `Launcher` as in the
+following example.
+
+[source,java,indent=0]
+----
+include::{testDir}/example/UsingTheLauncherDemo.java[tags=execution]
+----
+
+There is no return value for the `execute()` method, but you can easily use a listener to
+aggregate the final results in an object of your own. For examples see the
+`{SummaryGeneratingListener}` and `{LegacyXmlReportGeneratingListener}`.
+
+[[launcher-api-engines-custom]]
+==== Plugging in your own Test Engine
+
+JUnit currently provides two `{TestEngine}` implementations.
+
+* `{junit-jupiter-engine}`: The core of JUnit Jupiter.
+* `{junit-vintage-engine}`: A thin layer on top of JUnit 4 to allow running _vintage_
+  tests with the launcher infrastructure.
+
+Third parties may also contribute their own `TestEngine` by implementing the interfaces
+in the {junit-platform-engine} module and _registering_ their engine. By default, engine
+registration is supported via Java's `java.util.ServiceLoader` mechanism. For example,
+the `junit-jupiter-engine` module registers its
+`org.junit.jupiter.engine.JupiterTestEngine` in a file named
+`org.junit.platform.engine.TestEngine` within the `/META-INF/services` in the
+`junit-jupiter-engine` JAR.
+
+NOTE: `{HierarchicalTestEngine}` is a convenient abstract base implementation (used by
+the `{junit-jupiter-engine}`) that only requires implementors to provide the logic for
+test discovery. It implements execution of `TestDescriptors` that implement the `Node`
+interface, including support for parallel execution.
+
+[[launcher-api-engines-custom-ids]]
+[WARNING]
+.The `junit-` prefix is reserved for TestEngines from the JUnit Team
+====
+The JUnit Platform `Launcher` enforces that only `TestEngine` implementations published
+by the JUnit Team may use the `junit-` prefix for their `TestEngine` IDs.
+
+* If any third-party `TestEngine` claims to be `junit-jupiter` or `junit-vintage`, an
+  exception will be thrown, immediately halting execution of the JUnit Platform.
+* If any third-party `TestEngine` uses the `junit-` prefix for its ID, a warning message
+  will be logged. Later releases of the JUnit Platform will throw an exception for such
+  violations.
+====
+
+[[launcher-api-listeners-custom]]
+==== Plugging in your own Test Execution Listener
+
+In addition to the public `{Launcher}` API method for registering test execution
+listeners programmatically, by default custom `{TestExecutionListener}` implementations
+will be discovered at runtime via Java's `java.util.ServiceLoader` mechanism and
+automatically registered with the `Launcher` created via the `LauncherFactory`. For
+example, an `example.TestInfoPrinter` class implementing `{TestExecutionListener}` and
+declared within the
+`/META-INF/services/org.junit.platform.launcher.TestExecutionListener` file is loaded and
+registered automatically.
+
+[[launcher-api-listeners-reporting]]
+==== JUnit Platform Reporting
+
+The `junit-platform-reporting` artifact contains `{TestExecutionListener}`
+implementations that generate test reports. These listeners are typically used by IDEs
+and build tools. The package `org.junit.platform.reporting.legacy.xml` currently contains
+the following implementation.
+
+* `{LegacyXmlReportGeneratingListener}` generates a separate XML report for each root in
+  the `{TestPlan}`. Note that the generated XML format is compatible with the de facto
+  standard for JUnit 4 based test reports that was made popular by the Ant build system.
+  The `LegacyXmlReportGeneratingListener` is used by the
+  <<running-tests-console-launcher>> as well.
+
+NOTE: The `{junit-platform-launcher}` module also contains `{TestExecutionListener}`
+implementations that can be used for reporting purposes. See `{LoggingListener}` and
+`{SummaryGeneratingListener}` for details.
+
+[[launcher-api-launcher-config]]
+==== Configuring the Launcher
+
+If you require fine-grained control over automatic detection and registration of test
+engines and test execution listeners, you may create an instance of `LauncherConfig` and
+supply that to the `LauncherFactory.create(LauncherConfig)` method. Typically an instance
+of `LauncherConfig` is created via the built-in fluent _builder_ API, as demonstrated in
+the following example.
+
+[source,java,indent=0]
+----
+include::{testDir}/example/UsingTheLauncherDemo.java[tags=launcherConfig]
+----

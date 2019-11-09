@@ -1,0 +1,12 @@
+org.junit.jupiter.params@${jupiterVersion} jar:file:.+junit-jupiter-params/build/libs/junit-jupiter-params-${jupiterVersion}.jar/!module-info.class
+exports org.junit.jupiter.params
+exports org.junit.jupiter.params.aggregator
+exports org.junit.jupiter.params.converter
+exports org.junit.jupiter.params.provider
+exports org.junit.jupiter.params.support
+requires java.base mandated
+requires org.apiguardian.api transitive
+requires org.junit.jupiter.api transitive
+qualified opens org.junit.jupiter.params to org.junit.platform.commons
+qualified opens org.junit.jupiter.params.converter to org.junit.platform.commons
+qualified opens org.junit.jupiter.params.provider to org.junit.platform.commons

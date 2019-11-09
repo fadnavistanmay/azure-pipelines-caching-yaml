@@ -1,0 +1,117 @@
+trigger:
+- master
+
+strategy:
+  matrix:
+    linux 16 Uncached:    
+      VM_IMAGE: ubuntu-16.04
+      ENABLE_CACHE: 0
+    linux 18 Uncached:
+      VM_IMAGE: ubuntu-18.04
+      ENABLE_CACHE: 0
+    windows 2017 Uncached:
+      VM_IMAGE: vs2017-win2016
+      ENABLE_CACHE: 0
+    linux 16:    
+      VM_IMAGE: ubuntu-16.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+    linux 18:
+      VM_IMAGE: ubuntu-18.04
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+    windows 2017:
+      VM_IMAGE: vs2017-win2016
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
+pool:
+  vmImage: $(VM_IMAGE)
+
+
+variables:
+  skipComponentGovernanceDetection: true
+  GRADLE_USER_HOME: $(Pipeline.Workspace)/java-with-gradle/.gradle
+  CACHE_KEY: '"gradle" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | gradle.properties'
+  #CACHE_RESTOREKEY: gradle | $(Agent.OS) | $(Build.BuildId)
+  system.debug: true
+
+steps:
+  - task: CacheBeta@1
+    inputs:
+      key: $(CACHE_KEY)
+      path: $(GRADLE_USER_HOME)
+      restoreKeys: $(CACHE_RESTOREKEY)
+    displayName: Gradle build cache
+    condition: ne(variables.ENABLE_CACHE, '0')
+
+  - bash: |
+      set -e
+      # when executing on an Azure Pipelines build agent (not in a container)
+      # default to java 11
+      if [ -n "${JAVA_HOME_11_X64}" ]; then
+        export JAVA_HOME="${JAVA_HOME_11_X64}"
+      fi
+      ./gradlew --version
+      ./gradlew --build-cache --scan --warning-mode=all -Dplatform.tooling.support.tests.enabled=true build
+      # stop the gradle daemon so there isn't a problem with reading files in the SaveCache step
+      ./gradlew --stop
+    env:
+      LC_ALL: en_US.UTF-8
+    displayName: Test
+    continueOnError: ${{ parameters.continueOnError }}
+
+  - task: PublishTestResults@2
+    displayName: Publish Test Results
+    inputs:
+      testResultsFiles: '*/build/test-results/test/TEST-*.xml'
+    condition: eq(${{ parameters.publishTestResults }}, true)
+#jobs:
+#- job: linux_11
+#  displayName: Linux (OpenJDK 11)
+#  pool:
+#    vmImage: 'ubuntu-16.04'
+#  steps:
+#    - checkout: self
+#      fetchDepth: 10
+#    - template: src/azure/azure-gradle-step.yml
+#      parameters:
+#        publishTestResults: true
+#
+#- job: linux_12
+#  displayName: Linux (OpenJDK 12)
+#  pool:
+#    vmImage: 'ubuntu-16.04'
+#  container: openjdk:12
+#  steps:
+#    - checkout: self
+#      fetchDepth: 10
+#    - template: src/azure/azure-gradle-step.yml
+#
+#- job: linux_13
+#  displayName: Linux (OpenJDK 13)
+#  pool:
+#    vmImage: 'ubuntu-16.04'
+#  container: openjdk:13
+#  steps:
+#    - checkout: self
+#      fetchDepth: 10
+#    - template: src/azure/azure-gradle-step.yml
+#      parameters:
+#        continueOnError: true
+#
+#- job: Mac
+#  pool:
+#    vmImage: 'macOS-10.13'
+#  steps:
+#    - checkout: self
+#      fetchDepth: 10
+#    - template: src/azure/azure-gradle-step.yml
+#
+#- job: Windows
+#  pool:
+#    vmImage: 'windows-2019'
+#  steps:
+#    - checkout: self
+#      fetchDepth: 10
+#    - template: src/azure/azure-gradle-step.yml
+

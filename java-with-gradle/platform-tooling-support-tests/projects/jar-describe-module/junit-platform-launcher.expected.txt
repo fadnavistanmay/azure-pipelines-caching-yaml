@@ -1,0 +1,9 @@
+org.junit.platform.launcher@${platformVersion} jar:file:.+junit-platform-launcher/build/libs/junit-platform-launcher-${platformVersion}.jar/!module-info.class
+exports org.junit.platform.launcher
+exports org.junit.platform.launcher.core
+exports org.junit.platform.launcher.listeners
+requires java.base mandated
+requires org.apiguardian.api transitive
+requires org.junit.platform.engine transitive
+uses org.junit.platform.engine.TestEngine
+uses org.junit.platform.launcher.TestExecutionListener

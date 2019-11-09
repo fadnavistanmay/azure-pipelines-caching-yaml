@@ -1,0 +1,12 @@
+org.junit.platform.engine@${platformVersion} jar:file:.+junit-platform-engine/build/libs/junit-platform-engine-${platformVersion}.jar/!module-info.class
+exports org.junit.platform.engine
+exports org.junit.platform.engine.discovery
+exports org.junit.platform.engine.reporting
+exports org.junit.platform.engine.support.config
+exports org.junit.platform.engine.support.descriptor
+exports org.junit.platform.engine.support.discovery
+exports org.junit.platform.engine.support.hierarchical
+requires java.base mandated
+requires org.apiguardian.api transitive
+requires org.junit.platform.commons transitive
+requires org.opentest4j transitive
