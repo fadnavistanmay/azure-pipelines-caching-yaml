@@ -35,6 +35,10 @@ variables:
   #CACHE_RESTOREKEY: gradle | $(Agent.OS) | $(Build.BuildId)
   system.debug: true
 
+parameters:
+  continueOnError: false
+  publishTestResults: false
+
 steps:
   - task: CacheBeta@1
     inputs:
