@@ -1,0 +1,81 @@
+
+stages:
+- stage: firstrun
+  displayName: 'Empty Cache'
+  jobs:
+
+  - job: vs2019_hosted
+    pool:
+      name: Hosted Windows 2019 with VS2019
+
+    variables:
+      system.debug: true
+      # Since vcpkg is a Git submodule, its commit id is stored at /.git/modules/vcpkg/HEAD.
+      # vcpkgGitRef: not needed !
+
+    steps:
+      - checkout: self
+        submodules: recursive
+      - task: CacheBeta@1
+        displayName: Cache vcpkg
+        inputs:
+          key: $(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-windows.txt | $(Build.SourcesDirectory)/.git/modules/vcpkg2/HEAD | "$(Agent.OS)" | "VS2019" | $(Build.BuildId)
+          path: '$(Build.SourcesDirectory)/vcpkg2'
+      - task: Cache@2
+        displayName: Cache vcpkg GA
+        inputs:
+          key: $(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-windows.txt | $(Build.SourcesDirectory)/.git/modules/vcpkg2/HEAD | "$(Agent.OS)" | "VS2019" | $(Build.BuildId) | ga
+          path: '$(Build.SourcesDirectory)/vcpkg2'
+      - task: lucappa.cmake-ninja-vcpkg-tasks.d855c326-b1c0-4d6f-b1c7-440ade6835fb.run-vcpkg@0
+        displayName: 'Run vcpkg'
+        inputs:
+          vcpkgArguments: '@$(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-windows.txt'
+          vcpkgDirectory: '$(Build.SourcesDirectory)/vcpkg2'
+      - task: lucappa.cmake-ninja-vcpkg-tasks.f2b1ec7d-bc54-4cc8-b9ed-1bc7f37c9dc6.run-cmake@0
+        displayName: 'Run CMake with Ninja'
+        inputs:
+          cmakeListsTxtPath: 'cmakelists.txt/CMakeLists.txt'
+          useVcpkgToolchainFile: true
+          buildDirectory: '$(Build.ArtifactStagingDirectory)'
+          buildWithCMakeArgs: '-- -v'
+
+- stage: secondrun
+  displayName: 'Cached'
+  dependsOn: firstrun
+  jobs:
+  
+  - job: vs2019_hosted
+    pool:
+      name: Hosted Windows 2019 with VS2019
+  
+    variables:
+      system.debug: true
+      # Since vcpkg is a Git submodule, its commit id is stored at /.git/modules/vcpkg/HEAD.
+      # vcpkgGitRef: not needed !
+  
+    steps:
+      - checkout: self
+        submodules: recursive
+      - task: CacheBeta@1
+        displayName: Cache vcpkg
+        inputs:
+          key: $(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-windows.txt | $(Build.SourcesDirectory)/.git/modules/vcpkg2/HEAD | "$(Agent.OS)" | "VS2019" | $(Build.BuildId)
+          path: '$(Build.SourcesDirectory)/vcpkg2'
+      - task: Cache@2
+        displayName: Cache vcpkg GA
+        inputs:
+          key: $(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-windows.txt | $(Build.SourcesDirectory)/.git/modules/vcpkg2/HEAD | "$(Agent.OS)" | "VS2019" | $(Build.BuildId) | ga
+          path: '$(Build.SourcesDirectory)/vcpkg2'
+      - task: lucappa.cmake-ninja-vcpkg-tasks.d855c326-b1c0-4d6f-b1c7-440ade6835fb.run-vcpkg@0
+        displayName: 'Run vcpkg'
+        inputs:
+          vcpkgArguments: '@$(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-windows.txt'
+          vcpkgDirectory: '$(Build.SourcesDirectory)/vcpkg2'
+      - task: lucappa.cmake-ninja-vcpkg-tasks.f2b1ec7d-bc54-4cc8-b9ed-1bc7f37c9dc6.run-cmake@0
+        displayName: 'Run CMake with Ninja'
+        inputs:
+          cmakeListsTxtPath: 'cmakelists.txt/CMakeLists.txt'
+          useVcpkgToolchainFile: true
+          buildDirectory: '$(Build.ArtifactStagingDirectory)'
+          buildWithCMakeArgs: '-- -v'
+

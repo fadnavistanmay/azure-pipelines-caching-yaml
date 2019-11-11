@@ -1,0 +1,79 @@
+stages:
+- stage: firstrun
+  displayName: 'Empty Cache'
+  jobs:
+
+  - job: macos_hosted
+    pool:
+      vmImage: 'macOS-10.14'
+
+    variables:
+      system.debug: true
+      # Since vcpkg is a Git submodule, its commit id is stored at /.git/modules/vcpkg/HEAD.
+      # vcpkgGitRef: not needed !
+
+    steps:
+      - checkout: self
+        submodules: recursive
+      - template: ../templates/install-gcc-macos.yml
+      - task: CacheBeta@1
+        displayName: Cache vcpkg
+        inputs:
+          key: $(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-osx.txt | "$(Agent.OS)" | $(Build.SourcesDirectory)/.git/modules/vcpkg2/HEAD | "gcc" | $(Build.BuildId)
+          path: '$(Build.SourcesDirectory)/vcpkg2'
+      - task: Cache@2
+        displayName: Cache vcpkg GA
+        inputs:
+          key: $(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-osx.txt | "$(Agent.OS)" | $(Build.SourcesDirectory)/.git/modules/vcpkg2/HEAD | "gcc" | $(Build.BuildId) | ga
+          path: '$(Build.SourcesDirectory)/vcpkg2'
+      - task: lucappa.cmake-ninja-vcpkg-tasks.d855c326-b1c0-4d6f-b1c7-440ade6835fb.run-vcpkg@0
+        displayName: 'Run vcpkg'
+        inputs:
+          vcpkgArguments: '@$(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-osx.txt'
+          vcpkgDirectory: '$(Build.SourcesDirectory)/vcpkg2'
+      - task: lucappa.cmake-ninja-vcpkg-tasks.f2b1ec7d-bc54-4cc8-b9ed-1bc7f37c9dc6.run-cmake@0
+        displayName: 'Run CMake with Ninja'
+        inputs:
+          cmakeListsTxtPath: '$(Build.SourcesDirectory)/cmakelists.txt/CMakeLists.txt'
+          useVcpkgToolchainFile: true
+          buildWithCMakeArgs: '-- -v'
+
+- stage: secondrun
+  displayName: 'Cached'
+  dependsOn: firstrun
+  jobs:
+
+  - job: macos_hosted
+    pool:
+      vmImage: 'macOS-10.14'
+
+    variables:
+      system.debug: true
+      # Since vcpkg is a Git submodule, its commit id is stored at /.git/modules/vcpkg/HEAD.
+      # vcpkgGitRef: not needed !
+
+    steps:
+      - checkout: self
+        submodules: recursive
+      - template: ../templates/install-gcc-macos.yml
+      - task: CacheBeta@1
+        displayName: Cache vcpkg
+        inputs:
+          key: $(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-osx.txt | "$(Agent.OS)" | $(Build.SourcesDirectory)/.git/modules/vcpkg2/HEAD | "gcc" | $(Build.BuildId)
+          path: '$(Build.SourcesDirectory)/vcpkg2'
+      - task: Cache@2
+        displayName: Cache vcpkg GA
+        inputs:
+          key: $(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-osx.txt | "$(Agent.OS)" | $(Build.SourcesDirectory)/.git/modules/vcpkg2/HEAD | "gcc" | $(Build.BuildId) | ga
+          path: '$(Build.SourcesDirectory)/vcpkg2'
+      - task: lucappa.cmake-ninja-vcpkg-tasks.d855c326-b1c0-4d6f-b1c7-440ade6835fb.run-vcpkg@0
+        displayName: 'Run vcpkg'
+        inputs:
+          vcpkgArguments: '@$(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-osx.txt'
+          vcpkgDirectory: '$(Build.SourcesDirectory)/vcpkg2'
+      - task: lucappa.cmake-ninja-vcpkg-tasks.f2b1ec7d-bc54-4cc8-b9ed-1bc7f37c9dc6.run-cmake@0
+        displayName: 'Run CMake with Ninja'
+        inputs:
+          cmakeListsTxtPath: '$(Build.SourcesDirectory)/cmakelists.txt/CMakeLists.txt'
+          useVcpkgToolchainFile: true
+          buildWithCMakeArgs: '-- -v'
