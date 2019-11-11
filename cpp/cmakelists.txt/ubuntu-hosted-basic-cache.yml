@@ -31,6 +31,7 @@ steps:
     inputs:
       vcpkgArguments: '@$(Build.SourcesDirectory)/cpp/cmakelists.txt/vcpkg_x64-linux.txt'
       vcpkgGitCommitId: $(vcpkgGitRef)
+      vcpkgDirectory: '$(Build.SourcesDirectory)/cpp/vcpkg2'
       vcpkgGitURL: https://github.com/lukka/vcpkg.git
   - task: lucappa.cmake-ninja-vcpkg-tasks.f2b1ec7d-bc54-4cc8-b9ed-1bc7f37c9dc6.run-cmake@0
     displayName: 'Run CMake with Ninja'
