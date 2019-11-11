@@ -4,10 +4,10 @@ trigger:
 strategy:
   matrix:
     vs2017 Uncached:    
-      VM_IMAGE: vs2017_hosted
+      VM_IMAGE: vs2017-win2016
       ENABLE_CACHE: 0
     vs2017:    
-      VM_IMAGE: vs2017_hosted
+      VM_IMAGE: vs2017-win2016
       AZP_CACHING_CONTENT_FORMAT: SingleTar
       AZP_CACHING_TAR: 1
 
