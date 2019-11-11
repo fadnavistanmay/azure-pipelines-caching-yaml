@@ -35,7 +35,7 @@ steps:
   - task: lucappa.cmake-ninja-vcpkg-tasks.f2b1ec7d-bc54-4cc8-b9ed-1bc7f37c9dc6.run-cmake@0
     displayName: 'Run CMake with Ninja'
     inputs:
-      cmakeListsTxtPath: 'cmakelists.txt/CMakeLists.txt'
+      cmakeListsTxtPath: 'cpp/cmakelists.txt/CMakeLists.txt'
       useVcpkgToolchainFile: true
       buildWithCMakeArgs: '-- -v'
       ninjaDownloadUrl: https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip
