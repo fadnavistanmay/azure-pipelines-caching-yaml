@@ -25,6 +25,7 @@ steps:
     inputs:
       key: $(Build.SourcesDirectory)/cpp/cmakelists.txt/vcpkg_x64-windows.txt | "$(vcpkgGitRef)" | "$(Agent.OS)" | "win2017"
       path: '$(Build.SourcesDirectory)/cpp/vcpkg2'
+    condition: ne(variables.ENABLE_CACHE, '0')
   - task: lucappa.cmake-ninja-vcpkg-tasks.d855c326-b1c0-4d6f-b1c7-440ade6835fb.run-vcpkg@0
     displayName: 'Run vcpkg'
     inputs:
