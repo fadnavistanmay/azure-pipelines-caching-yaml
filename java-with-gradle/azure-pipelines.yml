@@ -9,19 +9,12 @@ strategy:
     linux 18 Uncached:
       VM_IMAGE: ubuntu-18.04
       ENABLE_CACHE: 0
-    windows 2017 Uncached:
-      VM_IMAGE: vs2017-win2016
-      ENABLE_CACHE: 0
     linux 16:    
       VM_IMAGE: ubuntu-16.04
       AZP_CACHING_CONTENT_FORMAT: SingleTar
       AZP_CACHING_TAR: 1
     linux 18:
       VM_IMAGE: ubuntu-18.04
-      AZP_CACHING_CONTENT_FORMAT: SingleTar
-      AZP_CACHING_TAR: 1
-    windows 2017:
-      VM_IMAGE: vs2017-win2016
       AZP_CACHING_CONTENT_FORMAT: SingleTar
       AZP_CACHING_TAR: 1
 pool:
