@@ -48,6 +48,9 @@ steps:
     displayName: Gradle build cache
     condition: ne(variables.ENABLE_CACHE, '0')
 
+  - script: |
+      chmod 777 -R java-with-gradle/
+
   - bash: |
       set -e
       # when executing on an Azure Pipelines build agent (not in a container)
