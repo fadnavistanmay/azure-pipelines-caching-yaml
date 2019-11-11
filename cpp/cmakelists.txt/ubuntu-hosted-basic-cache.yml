@@ -23,7 +23,7 @@ steps:
   - task: CacheBeta@0
     displayName: Cache vcpkg
     inputs:
-      key: $(Build.SourcesDirectory)/cpp/cmakelists.txt/vcpkg_x64-linux.txt | "$(vcpkgGitRef)" | "$(Agent.OS)"
+      key: $(Build.SourcesDirectory)/cpp/cmakelists.txt/vcpkg_x64-linux.txt | "$(vcpkgGitRef)" | "$(Agent.OS)" | "attempt"
       path: '$(Build.SourcesDirectory)/cpp/vcpkg2'
     condition: ne(variables.ENABLE_CACHE, '0')
   - task: lucappa.cmake-ninja-vcpkg-tasks.d855c326-b1c0-4d6f-b1c7-440ade6835fb.run-vcpkg@0
