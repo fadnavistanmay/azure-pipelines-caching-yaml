@@ -1,31 +1,43 @@
-jobs:
+trigger:
+- master
 
-- job: vs2017_hosted
-  pool:
-    name: Hosted VS2017
+strategy:
+  matrix:
+    vs2017 Uncached:    
+      VM_IMAGE: vs2017_hosted
+      ENABLE_CACHE: 0
+    vs2017:    
+      VM_IMAGE: vs2017_hosted
+      AZP_CACHING_CONTENT_FORMAT: SingleTar
+      AZP_CACHING_TAR: 1
 
-  variables:
-    system.debug: true
-    vcpkgGitRef: 36d276a19af03210c3fffcdee844b32b9b65334e
+pool:
+  vmImage: $(VM_IMAGE)
 
-  steps:
-    - task: CacheBeta@0
-      displayName: Cache vcpkg
-      inputs:
-        key: $(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-windows.txt | "$(vcpkgGitRef)" | "$(Agent.OS)"
-        path: '$(Build.BinariesDirectory)/vcpkg'
-    - task: lucappa.cmake-ninja-vcpkg-tasks.d855c326-b1c0-4d6f-b1c7-440ade6835fb.run-vcpkg@0
-      displayName: 'Run vcpkg'
-      inputs:
-        vcpkgArguments: '@$(Build.SourcesDirectory)/cmakelists.txt/vcpkg_x64-windows.txt'
-        vcpkgGitCommitId: $(vcpkgGitRef)
-        vcpkgGitURL: https://github.com/lukka/vcpkg.git
-    - task: lucappa.cmake-ninja-vcpkg-tasks.f2b1ec7d-bc54-4cc8-b9ed-1bc7f37c9dc6.run-cmake@0
-      displayName: 'Run CMake with Ninja'
-      inputs:
-        cmakeListsOrSettingsJson: 'CMakeListsTxtBasic'
-        cmakeListsTxtPath: 'cmakelists.txt/CMakeLists.txt'
-        useVcpkgToolchainFile: true
-        cmakeGenerator: 'Ninja'
-        buildDirectory: '$(Build.ArtifactStagingDirectory)'
-        buildWithCMakeArgs: '-- -v'
+variables:
+  skipComponentGovernanceDetection: true
+  system.debug: true
+  vcpkgGitRef: 36d276a19af03210c3fffcdee844b32b9b65334e
+
+steps:
+  - task: CacheBeta@0
+    displayName: Cache vcpkg
+    inputs:
+      key: $(Build.SourcesDirectory)/cpp/cmakelists.txt/vcpkg_x64-windows.txt | "$(vcpkgGitRef)" | "$(Agent.OS)" | "win2017"
+      path: '$(Build.BinariesDirectory)/cpp/vcpkg2'
+  - task: lucappa.cmake-ninja-vcpkg-tasks.d855c326-b1c0-4d6f-b1c7-440ade6835fb.run-vcpkg@0
+    displayName: 'Run vcpkg'
+    inputs:
+      vcpkgArguments: '@$(Build.SourcesDirectory)/cpp/cmakelists.txt/vcpkg_x64-windows.txt'
+      vcpkgGitCommitId: $(vcpkgGitRef)
+      vcpkgDirectory: '$(Build.SourcesDirectory)/cpp/vcpkg2'
+      vcpkgGitURL: https://github.com/lukka/vcpkg.git
+  - task: lucappa.cmake-ninja-vcpkg-tasks.f2b1ec7d-bc54-4cc8-b9ed-1bc7f37c9dc6.run-cmake@0
+    displayName: 'Run CMake with Ninja'
+    inputs:
+      cmakeListsOrSettingsJson: 'CMakeListsTxtBasic'
+      cmakeListsTxtPath: 'cpp/cmakelists.txt/CMakeLists.txt'
+      useVcpkgToolchainFile: true
+      cmakeGenerator: 'Ninja'
+      buildDirectory: '$(Build.ArtifactStagingDirectory)'
+      buildWithCMakeArgs: '-- -v'
