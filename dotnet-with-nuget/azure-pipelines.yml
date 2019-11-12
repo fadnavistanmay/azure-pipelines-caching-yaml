@@ -41,7 +41,7 @@ variables:
 
 steps:
 
-- task: CacheBeta@1
+- task: Cache@2
   inputs:
     key: $(CACHE_KEY)
     path: $(NUGET_PACKAGES)

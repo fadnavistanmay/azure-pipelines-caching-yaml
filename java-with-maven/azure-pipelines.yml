@@ -41,7 +41,7 @@ variables:
   system.debug: true
 
 steps:
-- task: CacheBeta@1
+- task: Cache@2
   inputs:
     key: $(CACHE_KEY)
     path: $(MAVEN_CACHE_FOLDER)

@@ -39,7 +39,7 @@ steps:
   inputs:
     versionSpec: '>= 2.5'
 
-- task: CacheBeta@1
+- task: Cache@2
   inputs:
     key: $(CACHE_KEY)
     path: $(BUNDLE_PATH)

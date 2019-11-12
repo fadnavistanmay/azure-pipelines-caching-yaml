@@ -33,7 +33,7 @@ variables:
 #  publishTestResults: false
 
 steps:
-  - task: CacheBeta@1
+  - task: Cache@2
     inputs:
       key: $(CACHE_KEY)
       path: $(GRADLE_USER_HOME)

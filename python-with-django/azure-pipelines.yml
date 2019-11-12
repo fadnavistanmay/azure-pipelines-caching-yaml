@@ -63,7 +63,7 @@ steps:
       print('Found Django project in', project_location)
       print('##vso[task.setvariable variable=projectRoot]{}'.format(project_location))
 
-- task: CacheBeta@1
+- task: Cache@2
   inputs:
     key: $(CACHE_KEY)
     path: $(PYTHONPATH)

@@ -84,7 +84,7 @@ steps:
   displayName: 'Install Node.js'
 
 # only look for the exact match for node_modules
-- task: CacheBeta@1
+- task: Cache@2
   inputs:
     key: $(node_modules_CACHE_KEY)
     path: 'node.js-with-yarn/node_modules'
