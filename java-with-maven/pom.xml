@@ -155,6 +155,32 @@
       <artifactId>maven-core</artifactId>
       <version>3.3.9</version>
     </dependency>
+    <dependency>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>azure-client-runtime</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>azure-arm-client-runtime</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>azure-client-authentication</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>azure-mgmt-resources</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>azure-arm-client-runtime</artifactId>
+        <type>test-jar</type>
+        <scope>test</scope>
+        <!--Below version for test jar needs to be removed, this will be done as part of v1-runtime 1.6.7-->
+        <version>1.6.5</version>
+    </dependency>
   </dependencies>
 
   <build>
