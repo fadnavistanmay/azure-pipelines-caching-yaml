@@ -196,11 +196,6 @@
           <outputDirectory>target/dir</outputDirectory>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
     </plugins>
   </build>
 
