@@ -37,7 +37,7 @@ variables:
   skipComponentGovernanceDetection: true
   MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/java-with-maven/.m2/repository
   MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
-  CACHE_KEY: '"maven2" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | java-with-maven/**/pom.xml'
+  CACHE_KEY: '"maven23" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | java-with-maven/**/pom.xml'
   system.debug: true
 
 steps:
