@@ -36,7 +36,7 @@ variables:
   skipComponentGovernanceDetection: true
   buildConfiguration: 'Release'
   NUGET_PACKAGES: $(Pipeline.Workspace)/dotnet-with-nuget/.nuget/packages
-  CACHE_KEY: '"nuget42" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | $(CACHE_PACK) | dotnet-with-nuget/ packages.lock.json'
+  CACHE_KEY: '"nuget42" | "$(VM_IMAGE)" | "AZP_CACHING_CONTENT_FORMAT=$(AZP_CACHING_CONTENT_FORMAT)" | $(CACHE_PACK) | dotnet-with-nuget/packages.lock.json'
   system.debug: true
 
 steps:
