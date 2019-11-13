@@ -27,40 +27,47 @@ pool:
   vmImage: $(VM_IMAGE)
 
 variables:
+  # ignore this
   skipComponentGovernanceDetection: true
-  # # cache the npm cache
+  
+  # override where npm will use the cache per https://www.npmjs.com/package/config-cache
   npm_config_cache: $(Pipeline.Workspace)/.npm
-  dotnpm_CACHE_KEY: '$(dotnpm_CACHE_FALLBACK_KEY) | node.js-with-npm/package-lock.json'
-  dotnpm_CACHE_FALLBACK_KEY: '".npm" | "$(VM_IMAGE)"'
-  # cache the node_modules folder
+
+  # the node_modules (and maybe the npm cache) cannot be reused across versions
+  # This is probably not strictly needed because we are using the NodeTool installer to lock on a specific version.
   node_version_file: $(Pipeline.Workspace)/node.version.txt
-  node_modules_CACHE_KEY: '"node_modules" | "$(VM_IMAGE)" | $(node_version_file) | node.js-with-npm/package.json | node.js-with-npm/package-lock.json'
 
 steps:
 - task: NodeTool@0
   inputs:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
-- script: node --version > $(node_version_file)
 
 # only look for the exact match for node_modules
+- script: node --version > $(node_version_file)
 - task: Cache@2
   inputs:
-    key: $(node_modules_CACHE_KEY)
+    key: '"node_modules $(VM_IMAGE)" | $(node_version_file) | node.js-with-npm/package.json | node.js-with-npm/package-lock.json'
     path: 'node.js-with-npm/node_modules'
     cacheHitVar: NODE_MODULES_RESTORED
   displayName: 'Cache node_modules'
   condition: ne(variables.ENABLE_CACHE, '0')
   
-# # if we didn't get a good match for node_modules, see if we have a recent copy of the .npm cache folder
+# if we didn't get an match for node_modules, see if we have a recent copy of the .npm cache folder
 - task: Cache@2
   inputs:
-    key: $(dotnpm_CACHE_KEY)
-    restoreKeys: $(dotnpm_CACHE_FALLBACK_KEY)
+    key: '".npm $(VM_IMAGE)" | $(node_version_file) | node.js-with-npm/package.json | node.js-with-npm/package-lock.json'
+    restoreKeys: |
+      '".npm $(VM_IMAGE)" | $(node_version_file) | node.js-with-npm/package.json'
+      '".npm $(VM_IMAGE)" | $(node_version_file)'
     path: $(npm_config_cache)
   displayName: 'Cache .npm'
-  condition: ne(variables.NODE_MODULES_RESTORED, 'true')
+  condition: and(ne(variables.NODE_MODULES_RESTORED, 'true'), ne(variables.ENABLE_CACHE, '0'))
 
+# at this point either:
+# 1. we have an exact node_modules folder and NODE_MODULES_RESTORED=='true'
+# or
+# 2. we have no node_modules folder and NODE_MODULES_RESTORED!='true'
 - script: |
     cd node.js-with-npm
     npm ci
