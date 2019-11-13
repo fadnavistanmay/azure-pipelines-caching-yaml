@@ -57,7 +57,7 @@ steps:
   inputs:
     key: $(dotnpm_CACHE_KEY)
     restoreKeys: $(dotnpm_CACHE_FALLBACK_KEY)
-    path: $(npm_config_change)
+    path: $(npm_config_cache)
   displayName: 'Cache .npm'
   condition: ne(variables.NODE_MODULES_RESTORED, 'true')
 
