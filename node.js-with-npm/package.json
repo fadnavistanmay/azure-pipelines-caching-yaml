@@ -10,7 +10,6 @@
   "private": true,
   "scripts": {
     "test": "mocha",
-    "preinstall": "node preinstall.js",
     "compile": "gulp compile --max_old_space_size=4095",
     "watch": "gulp watch --max_old_space_size=4095",
     "watch-client": "gulp watch-client --max_old_space_size=4095",
@@ -118,7 +117,7 @@
     "mime": "^1.4.1",
     "minimatch": "^3.0.4",
     "mkdirp": "^0.5.0",
-    "mocha": "^2.2.5",
+    "mocha": "^2.5.3",
     "mocha-junit-reporter": "^1.17.0",
     "opn": "^6.0.0",
     "optimist": "0.3.5",
