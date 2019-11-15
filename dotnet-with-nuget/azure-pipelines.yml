@@ -58,6 +58,7 @@ steps:
 
 - script: |
     cd dotnet-with-nuget
+    nuget locals all -clear
     dotnet restore --locked-mode
   displayName: 'dotnet restore'
   condition: ne(variables.CACHE_RESTORED, 'true')
