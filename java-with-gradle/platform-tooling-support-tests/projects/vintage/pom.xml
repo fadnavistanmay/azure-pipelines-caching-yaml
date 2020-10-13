@@ -11,7 +11,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
         <vintageVersion>${env.JUNIT_VINTAGE_VERSION}</vintageVersion>
-        <junit4Version>4.12</junit4Version>
+        <junit4Version>4.13.1</junit4Version>
     </properties>
 
     <dependencies>
