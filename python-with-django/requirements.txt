@@ -85,7 +85,7 @@ webencodings==0.5.1
 Werkzeug==0.14.1
 widgetsnbextension==3.4.2
 xlrd==1.1.0
-certifi==2018.10.15
+certifi==2022.12.7
 chardet==3.0.4
 #
 
